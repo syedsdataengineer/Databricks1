@@ -1,0 +1,22 @@
+1. Extract Data from AWS Cost Explorer API
+	•	Use Boto3 (AWS SDK for Python) to interact with the Cost Explorer API.
+	•	Schedule API calls to fetch cost data (daily, hourly, or as per requirements).
+	•	Store the extracted data as JSON or Parquet in an S3 bucket.
+
+2. Load Data into Databricks (Bronze Layer)
+	•	Use Databricks Auto Loader to ingest data from S3 into a Bronze Delta Table.
+	•	Configure Auto Loader with cloudFiles for incremental loading.
+	•	Enable schema evolution to handle changes in API response structure.
+
+3. Transform and Process Data (Silver Layer)
+	•	Perform deduplication, data cleansing, and normalization.
+	•	Convert JSON fields into structured formats using Explode() if necessary.
+	•	Use Delta Lake’s MERGE INTO to manage incremental updates.
+
+4. Aggregate & Optimize for Analytics (Gold Layer)
+	•	Create aggregated tables (e.g., cost breakdowns by service, account, region).
+	•	Optimize query performance using Z-Order clustering and Delta Lake optimizations.
+
+5. Workflow Scheduling & Orchestration
+	•	Use Databricks Workflows or Airflow to schedule the pipeline.
+	•	Define dependencies and retry logic for failure handling.

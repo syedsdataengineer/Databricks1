@@ -1,0 +1,2 @@
+path = f"/dbfs/mnt/raw/aws_cost/cost_{date.today()}.json"
+df.to_json(path, orient='records', lines=True)

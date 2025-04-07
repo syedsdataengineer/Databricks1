@@ -1,0 +1,23 @@
+import pandas as pd
+
+# Assume response is your actual AWS Cost Explorer output
+results = response['ResultsByTime'][0]['Groups']
+
+# Parse the list of services and their amortized cost
+data = []
+for item in results:
+    service_name = item['Keys'][0]
+    amount = float(item['Metrics']['AmortizedCost']['Amount'])
+    unit = item['Metrics']['AmortizedCost']['Unit']
+    
+    data.append({
+        'Service': service_name,
+        'Amount': amount,
+        'Unit': unit
+    })
+
+# Convert to DataFrame
+df = pd.DataFrame(data)
+
+# Display
+print(df)

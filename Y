@@ -3,3 +3,26 @@ session = boto3.Session(
     aws_secret_access_key="YOUR_SECRET_KEY",
     region_name="us-east-1"
 )
+
+
+
+
+
+from pyspark.sql.functions import input_file_name
+
+raw_path = "/mnt/raw/aws_cost/"
+bronze_path = "/mnt/bronze/aws_cost/"
+
+df = (spark.readStream
+    .format("cloudFiles")
+    .option("cloudFiles.format", "json")
+    .option("cloudFiles.inferColumnTypes", "true")
+    .load(raw_path)
+)
+
+df.withColumn("source_file", input_file_name()) \
+  .writeStream \
+  .format("delta") \
+  .option("checkpointLocation", "/mnt/checkpoints/aws_cost/bronze") \
+  .outputMode("append") \
+  .start(bronze_path)

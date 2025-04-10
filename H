@@ -1,0 +1,54 @@
+# STEP 1: Prepare and Clean the DataFrame
+import pandas as pd
+
+# Assuming 'df' is already created and contains these columns:
+# ['date', 'service', 'amount', 'unit']
+
+# Convert 'date' to datetime if it's not already
+df["date"] = pd.to_datetime(df["date"])
+
+# Add a month column for easier filtering
+df["month"] = df["date"].dt.strftime("%Y-%m")
+
+# Optional: Ensure 'amount' is numeric
+df["amount"] = pd.to_numeric(df["amount"], errors='coerce')
+
+# Preview full data
+display(df)
+
+
+df_summary = df.groupby(["month", "date", "service"], as_index=False)["amount"].sum()
+display(df_summary)
+
+
+
+# STEP 1: Prepare and Clean the DataFrame
+import pandas as pd
+
+# Assuming 'df' is already created and contains these columns:
+# ['date', 'service', 'amount', 'unit']
+
+# Convert 'date' to datetime if it's not already
+df["date"] = pd.to_datetime(df["date"])
+
+# Add a month column for easier filtering
+df["month"] = df["date"].dt.strftime("%Y-%m")
+
+# Optional: Ensure 'amount' is numeric
+df["amount"] = pd.to_numeric(df["amount"], errors='coerce')
+
+# Preview full data
+display(df)
+
+
+# STEP 2: Create Summary Table for Dashboard (Total cost grouped)
+df_summary = df.groupby(["month", "date", "service"], as_index=False)["amount"].sum()
+
+# Show grouped data — this will be used in dashboard
+display(df_summary)
+
+
+
+# Cost by date and service for a line/bar chart
+df_chart = df.groupby(["date", "service"], as_index=False)["amount"].sum()
+display(df_chart)

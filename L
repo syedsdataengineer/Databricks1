@@ -1,0 +1,80 @@
+-- Workspace name mapping
+WITH workspace AS (
+  SELECT 
+    EXPLODE(MAP_ENTRIES(
+      FROM_JSON('{
+        "1156955077767742": "watech-rp-pilot-ws-dev",
+        "2314456970872459": "ats-id-ws-dev",
+        "2214429524059458": "WatechEDP_Sandbox",
+        "2344454599848459": "watech-aid-edp-ws-prod",
+        "2169965810951522": "watech-test-niaps-ws-dev",
+        "2369523264119952": "watech-aid-edp-ws-dev"
+      }', "MAP<STRING, STRING>")
+    )) AS kvp
+),
+workspace_named AS (
+  SELECT
+    kvp['key'] AS workspace_id,
+    kvp['value'] AS workspace_name
+  FROM workspace
+),
+
+-- Join usage data with mapped workspace names and filter by date
+usage_with_ws_filtered_by_date AS (
+  SELECT
+    CASE
+      WHEN workspace_name IS NULL THEN CONCAT('id: ', u.workspace_id)
+      ELSE CONCAT(workspace_name, ' (id: ', u.workspace_id, ')')
+    END AS workspace,
+    u.*
+  FROM system.billing.usage AS u
+  LEFT JOIN workspace_named ON u.workspace_id = workspace_named.workspace_id
+  WHERE u.usage_date BETWEEN :param_start_date AND :param_end_date
+),
+
+-- Apply workspace filter from dashboard
+usage_filtered AS (
+  SELECT *
+  FROM usage_with_ws_filtered_by_date
+  WHERE IF(:param_workspace = 'ALL WORKSPACES', TRUE, workspace = :param_workspace)
+),
+
+-- Bring in pricing (USD) from list_prices table
+prices AS (
+  SELECT
+    COALESCE(price_end_time, DATE_ADD(CURRENT_DATE(), 1)) AS coalesced_price_end_time,
+    *
+  FROM system.billing.list_prices
+  WHERE currency_code = 'USD'
+),
+
+-- Calculate cost by usage * list price
+list_priced AS (
+  SELECT
+    COALESCE(u.usage_quantity * p.pricing.effective_list.default, 0) AS usage_usd,
+    DATE_TRUNC('QUARTER', usage_date) AS usage_quarter,
+    DATE_TRUNC('MONTH', usage_date) AS usage_month,
+    DATE_TRUNC('WEEK', usage_date) AS usage_week
+  FROM usage_filtered AS u
+  LEFT JOIN prices AS p
+    ON u.sku_name = p.sku_name
+    AND u.usage_unit = p.usage_unit
+    AND u.usage_end_time BETWEEN p.price_start_time AND p.coalesced_price_end_time
+),
+
+-- Aggregate total usage in USD
+usage_total AS (
+  SELECT SUM(usage_usd) AS usage_usd FROM list_priced
+)
+
+-- Final output
+SELECT
+  CONCAT('Total usage (USD): $',
+    CASE
+      WHEN usage_usd >= 1e9 THEN CONCAT(FORMAT_NUMBER(usage_usd / 1e9, 2), 'B')
+      WHEN usage_usd >= 1e6 THEN CONCAT(FORMAT_NUMBER(usage_usd / 1e6, 2), 'M')
+      WHEN usage_usd >= 1e3 THEN CONCAT(FORMAT_NUMBER(usage_usd / 1e3, 2), 'K')
+      ELSE FORMAT_NUMBER(usage_usd, 2)
+    END
+  ) AS total_usage
+FROM usage_total;

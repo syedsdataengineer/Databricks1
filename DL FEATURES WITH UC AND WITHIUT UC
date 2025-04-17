@@ -1,0 +1,66 @@
+Delta Lake Features That Work Without Unity Catalog
+
+You can use these features without Unity Catalog:
+	•	ACID transactions
+	•	Time Travel
+	•	Rollback to previous versions
+	•	Schema enforcement and evolution
+	•	Upserts, deletes, and merges
+	•	Basic Change Data Feed (CDF) – works for Delta tables, allows tracking row-level changes
+	•	Optimize and Z-Ordering
+	•	Partitioning and data skipping
+	•	File compaction and vacuuming
+
+These are available using the Hive metastore or even with no catalog.
+
+⸻
+
+Features That Require Unity Catalog
+
+These features require Unity Catalog:
+	•	Fine-grained access control (row/column level, data masking)
+	•	Centralized governance and unified auditing
+	•	Data lineage tracking
+	•	Cross-workspace and external data sharing
+	•	Enhanced CDF – includes support for clones, schema evolution tracking, and integration with lineage
+	•	Delta Sharing with full access controls
+
+
+
+
+
+Delta Lake Features That Work Without Unity Catalog
+	1.	ACID Transactions
+Delta Lake Overview – ACID Transactions
+	2.	Time Travel
+Delta Time Travel
+	3.	Rollback to Previous Versions
+RESTORE TABLE Documentation
+	4.	Schema Enforcement and Evolution
+Delta Lake Schema Enforcement & Evolution
+	5.	Upserts, Deletes, and Merges
+MERGE INTO Documentation
+	6.	Basic Change Data Feed (CDF)
+Change Data Feed Without Unity Catalog
+	7.	Optimize and Z-Ordering
+OPTIMIZE and ZORDER Documentation
+	8.	Partitioning and Data Skipping
+Delta Lake Partitioning and Skipping
+	9.	File Compaction and Vacuuming
+VACUUM Command Documentation
+
+⸻
+
+Features That Require Unity Catalog
+	1.	Fine-Grained Access Control (Row/Column Level, Data Masking)
+Unity Catalog - Access Control
+	2.	Centralized Governance and Unified Auditing
+Unity Catalog - Data Lineage and Audit Logs
+	3.	Data Lineage Tracking
+Unity Catalog Lineage
+	4.	Cross-Workspace and External Data Sharing
+Unity Catalog for Data Sharing
+	5.	Enhanced Change Data Feed (CDF)
+CDF with Unity Catalog Features
+	6.	Delta Sharing with Full Access Controls
+Delta Sharing with Unity Catalog

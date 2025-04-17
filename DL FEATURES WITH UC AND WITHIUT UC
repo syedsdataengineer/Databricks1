@@ -64,3 +64,50 @@ Unity Catalog for Data Sharing
 CDF with Unity Catalog Features
 	6.	Delta Sharing with Full Access Controls
 Delta Sharing with Unity Catalog
+
+
+
+
+
+
+
+
+
+
+
+
+Delta Lake Features That Work Without Unity Catalog
+	•	ACID Transactions
+https://docs.databricks.com/en/delta/index.html#delta-lake-features
+	•	Time Travel
+https://docs.databricks.com/en/delta/delta-time-travel.html
+	•	Rollback to Previous Versions (RESTORE TABLE)
+https://docs.databricks.com/en/sql/language-manual/delta-restore.html
+	•	Schema Enforcement and Evolution
+https://docs.databricks.com/en/delta/schema.html
+	•	Upserts, Deletes, and Merges (MERGE INTO)
+https://docs.databricks.com/en/delta/delta-update.html#merge
+	•	Basic Change Data Feed (CDF)
+https://learn.microsoft.com/en-us/azure/databricks/delta/delta-change-data-feed#requirements
+	•	Optimize and Z-Ordering
+https://docs.databricks.com/en/delta/optimize.html
+	•	Partitioning and Data Skipping
+https://docs.databricks.com/en/delta/delta-storage.html#partitioning
+	•	File Compaction and Vacuuming (VACUUM)
+https://docs.databricks.com/en/delta/delta-utility.html#remove-files-no-longer-referenced-by-a-delta-table-vacuum
+
+⸻
+
+Features That Require Unity Catalog
+	•	Fine-Grained Access Control (row/column level, data masking)
+https://docs.databricks.com/en/data-governance/unity-catalog/permissions.html
+	•	Centralized Governance and Unified Auditing
+https://docs.databricks.com/en/data-governance/unity-catalog/index.html#audit-logs
+	•	Data Lineage Tracking
+https://docs.databricks.com/en/data-governance/unity-catalog/data-lineage.html
+	•	Cross-Workspace and External Data Sharing
+https://docs.databricks.com/en/data-sharing/unity-catalog/index.html
+	•	Enhanced Change Data Feed (CDF)
+https://learn.microsoft.com/en-us/azure/databricks/delta/delta-change-data-feed#limitations
+	•	Delta Sharing with Full Access Controls
+https://docs.databricks.com/en/data-sharing/unity-catalog/index.html

@@ -1,0 +1,134 @@
+-- Map workspace IDs to names
+WITH workspace AS (
+  SELECT 
+    EXPLODE(MAP_ENTRIES(
+      FROM_JSON('{
+        "
+      }', "MAP<STRING, STRING>")
+    )) AS kvp
+),
+workspace_named AS (
+  SELECT
+    kvp['key'] AS workspace_id,
+    kvp['value'] AS workspace_name
+  FROM workspace
+),
+usage_with_ws_filtered_by_date AS (
+  -- Join workspace names and filter by date range
+  SELECT
+    CASE
+      WHEN workspace_name IS NULL THEN CONCAT('id: ', u.workspace_id)
+      ELSE CONCAT(workspace_name, ' (id: ', u.workspace_id, ')')
+    END AS workspace,
+    u.*
+  FROM system.billing.usage AS u
+  LEFT JOIN workspace_named ON u.workspace_id = workspace_named.workspace_id
+  WHERE u.usage_date BETWEEN :param_start_date AND :param_end_date
+),
+usage_filtered AS (
+  -- Apply workspace filter if not ALL WORKSPACES
+  SELECT *
+  FROM usage_with_ws_filtered_by_date
+  WHERE IF(:param_workspace = 'ALL WORKSPACES', TRUE, workspace = :param_workspace)
+),
+-- USD pricing info
+prices AS (
+  SELECT 
+    COALESCE(price_end_time, DATE_ADD(CURRENT_DATE, 1)) AS coalesced_price_end_time,
+    *
+  FROM system.billing.list_prices
+  WHERE currency_code = 'USD'
+),
+-- Compute USD usage
+list_priced_usd AS (
+  SELECT
+    COALESCE(u.usage_quantity * p.pricing.effective_list.default, 0) AS usage_usd
+  FROM usage_filtered u
+  LEFT JOIN prices p 
+    ON u.sku_name = p.sku_name
+    AND u.usage_unit = p.usage_unit
+    AND u.usage_end_time BETWEEN p.price_start_time AND p.coalesced_price_end_time
+),
+-- Compute DBU usage
+list_dbu AS (
+  SELECT
+    COALESCE(usage_quantity, 0) AS usage_dbu
+  FROM usage_filtered
+),
+-- Total USD usage
+usd_total AS (
+  SELECT SUM(usage_usd) AS total_usd FROM list_priced_usd
+),
+-- Total DBU usage
+dbu_total AS (
+  SELECT SUM(usage_dbu) AS total_dbu FROM list_dbu
+)
+
+-- Final output
+SELECT
+  CONCAT('Total usage (USD): $', 
+    CASE
+      WHEN total_usd >= 1e9 THEN CONCAT(FORMAT_NUMBER(total_usd / 1e9, 2), 'B')
+      WHEN total_usd >= 1e6 THEN CONCAT(FORMAT_NUMBER(total_usd / 1e6, 2), 'M')
+      WHEN total_usd >= 1e3 THEN CONCAT(FORMAT_NUMBER(total_usd / 1e3, 2), 'K')
+      ELSE FORMAT_NUMBER(total_usd, 2)
+    END
+  ) AS total_usage_usd,
+  
+  CONCAT('Total usage (DBU): ', FORMAT_NUMBER(total_dbu, 2)) AS total_usage_dbu
+
+FROM usd_total, dbu_total;
+
+
+
+
+
+-- Map workspace IDs to names
+WITH workspace AS (
+  SELECT 
+    EXPLODE(MAP_ENTRIES(
+      FROM_JSON('{
+        "
+      }', "MAP<STRING, STRING>")
+    )) AS kvp
+),
+workspace_named AS (
+  SELECT
+    kvp['key'] AS workspace_id,
+    kvp['value'] AS workspace_name
+  FROM workspace
+),
+usage_with_ws_filtered_by_date AS (
+  -- Join workspace names and filter by date range
+  SELECT
+    CASE
+      WHEN workspace_name IS NULL THEN CONCAT('id: ', u.workspace_id)
+      ELSE CONCAT(workspace_name, ' (id: ', u.workspace_id, ')')
+    END AS workspace,
+    u.*
+  FROM system.billing.usage AS u
+  LEFT JOIN workspace_named ON u.workspace_id = workspace_named.workspace_id
+  WHERE u.usage_date BETWEEN :param_start_date AND :param_end_date
+),
+usage_filtered AS (
+  -- Apply workspace filter if not ALL WORKSPACES
+  SELECT *
+  FROM usage_with_ws_filtered_by_date
+  WHERE IF(:param_workspace = 'ALL WORKSPACES', TRUE, workspace = :param_workspace)
+),
+-- Compute DBU usage
+list_dbu AS (
+  SELECT
+    COALESCE(usage_quantity, 0) AS usage_dbu,
+    DATE_TRUNC('QUARTER', usage_date) AS usage_quarter,
+    DATE_TRUNC('MONTH', usage_date) AS usage_month,
+    DATE_TRUNC('WEEK', usage_date) AS usage_week
+  FROM usage_filtered
+),
+usage_total AS (
+  SELECT SUM(usage_dbu) AS total_dbu FROM list_dbu
+)
+-- Final output: formatted total DBUs
+SELECT
+  CONCAT('Total DBU usage: ', FORMAT_NUMBER(total_dbu, 2)) AS total_usage_dbu
+FROM usage_total;

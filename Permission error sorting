@@ -1,0 +1,53 @@
+Great — let’s walk through Step 3: Granting API permissions and admin consent in the Azure Portal:
+
+⸻
+
+Step-by-Step: Grant API Permissions + Admin Consent
+
+1. Go to Azure Portal
+
+Open https://portal.azure.com
+
+2. Navigate to App Registrations
+	•	In the search bar, type “App registrations”
+	•	Click on “App registrations”
+	•	Find and click on your app (look for the Client ID you used in Databricks)
+
+3. Go to API Permissions
+	•	In the left-hand menu, click “API permissions”
+
+4. Add Required Permissions
+	•	Click “+ Add a permission”
+	•	Choose Microsoft APIs > Azure Service Management or Azure Cost Management
+	•	For Azure Cost data:
+	•	Choose: APIs my organization uses
+	•	Search for: Microsoft.CostManagement
+	•	Select it, then choose:
+Delegated permissions > CostManagementQuery.Read
+	•	Or for broader access, use Application permissions
+	•	Click Add permissions
+
+5. Grant Admin Consent
+	•	After permissions are added, you may see a warning message under “Status” like:
+“Not granted for ”
+	•	Click the “Grant admin consent for ” button
+	•	You need to be an admin, or ask your Azure AD admin to do this part
+
+6. Confirm Everything
+	•	The status should now say: Granted for 
+
+⸻
+
+Optional: Permissions You Might Need
+
+If you don’t see Microsoft.CostManagement, or it’s not working, try adding:
+	•	Azure Service Management > Application permissions:
+	•	user_impersonation
+
+This is the more general way to let apps use Azure REST APIs.
+
+⸻
+
+Once you’ve done this, re-run your Databricks notebook — it should authenticate successfully now.
+
+Let me know if you want to test a minimal token fetch just to confirm auth is working before running the full cost query.

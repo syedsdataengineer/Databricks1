@@ -1,0 +1,62 @@
+import requests
+from azure.identity import ClientSecretCredential
+import json
+from datetime import datetime, timedelta
+
+# Fetch credentials from Databricks secrets
+client_id = dbutils.secrets.get(scope="azure-cost-scope", key="AZURE_CLIENT_ID")
+client_secret = dbutils.secrets.get(scope="azure-cost-scope", key="AZURE_CLIENT_SECRET")
+tenant_id = dbutils.secrets.get(scope="azure-cost-scope", key="AZURE_TENANT_ID")
+subscription_id = dbutils.secrets.get(scope="azure-cost-scope", key="SUBSCRIPTION_ID")
+
+# Set up authentication using Service Principal credentials
+credential = ClientSecretCredential(tenant_id, client_id, client_secret)
+
+# Azure Cost Management API endpoint
+url = f"https://management.azure.com/subscriptions/{subscription_id}/providers/Microsoft.CostManagement/query?api-version=2021-10-01"
+
+# Calculate the date range for the last 12 months
+end_date = datetime.utcnow()
+start_date = end_date - timedelta(days=365)
+
+# Format the start and end dates
+start_date_str = start_date.strftime("%Y-%m-%d")
+end_date_str = end_date.strftime("%Y-%m-%d")
+
+# Define the request body for cost data
+query_body = {
+    "type": "Usage",
+    "timeframe": "Custom",
+    "timePeriod": {
+        "from": start_date_str,
+        "to": end_date_str
+    },
+    "dataset": {
+        "granularity": "Daily",
+        "aggregation": {
+            "totalCost": {
+                "name": "Cost",
+                "function": "Sum"
+            }
+        }
+    }
+}
+
+# Get the access token for authentication
+token = credential.get_token("https://management.azure.com/.default").token
+
+# Set headers for the request
+headers = {
+    "Authorization": f"Bearer {token}",
+    "Content-Type": "application/json"
+}
+
+# Make the API call
+response = requests.post(url, headers=headers, json=query_body)
+
+# Process the response
+if response.status_code == 200:
+    cost_data = response.json()
+    display(json.dumps(cost_data, indent=4))
+else:
+    print(f"Failed to retrieve data: {response.status_code}, {response.text}")

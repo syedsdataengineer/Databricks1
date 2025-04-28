@@ -1,0 +1,128 @@
+# Accessing Azure Cost API from Databricks Notebooks
+
+Here's a comprehensive guide to pulling Azure cost data into Databricks notebooks:
+
+## Prerequisites
+- Azure subscription with appropriate permissions (Cost Management Reader or higher)
+- Databricks workspace running on Azure
+- Service Principal with cost management API permissions
+
+## Step 1: Set Up Authentication
+
+### Create a Service Principal (if you don't have one)
+```python
+# You can create this in Azure Portal or Azure CLI:
+# az ad sp create-for-rbac --name "DatabricksCostReader" --role "Cost Management Reader"
+```
+
+### Store credentials in Databricks secrets
+```python
+# Store these in Databricks secrets (CLI example):
+# databricks secrets put --scope azure-cost --key client-id --string-value "YOUR_CLIENT_ID"
+# databricks secrets put --scope azure-cost --key client-secret --string-value "YOUR_CLIENT_SECRET"
+# databricks secrets put --scope azure-cost --key tenant-id --string-value "YOUR_TENANT_ID"
+```
+
+## Step 2: Install Required Libraries
+```python
+# Run this in your notebook
+%pip install azure-identity azure-mgmt-costmanagement msrest
+dbutils.library.restartPython()
+```
+
+## Step 3: Authenticate and Query Cost API
+
+```python
+from azure.identity import ClientSecretCredential
+from azure.mgmt.costmanagement import CostManagementClient
+from azure.mgmt.costmanagement.models import QueryDefinition, QueryTimePeriod
+from datetime import datetime, timedelta
+import pandas as pd
+
+# Get credentials from Databricks secrets
+client_id = dbutils.secrets.get(scope="azure-cost", key="client-id")
+client_secret = dbutils.secrets.get(scope="azure-cost", key="client-secret")
+tenant_id = dbutils.secrets.get(scope="azure-cost", key="tenant-id")
+
+# Authenticate
+credentials = ClientSecretCredential(
+    tenant_id=tenant_id,
+    client_id=client_id,
+    client_secret=client_secret
+)
+
+# Create client
+subscription_id = "YOUR_SUBSCRIPTION_ID"
+client = CostManagementClient(credentials)
+
+# Define query parameters
+time_period = QueryTimePeriod(
+    from_property=datetime.now() - timedelta(days=30),
+    to=datetime.now()
+)
+
+query = QueryDefinition(
+    type="ActualCost",
+    timeframe="Custom",
+    time_period=time_period,
+    dataset={
+        "granularity": "Daily",
+        "aggregation": {
+            "totalCost": {
+                "name": "Cost",
+                "function": "Sum"
+            }
+        },
+        "grouping": [
+            {
+                "type": "Dimension",
+                "name": "ServiceName"
+            }
+        ]
+    }
+)
+
+# Execute query
+scope = f"/subscriptions/{subscription_id}"
+result = client.query.usage(scope, query)
+
+# Convert to pandas DataFrame
+rows = []
+for row in result.rows:
+    service_name = row[0]
+    cost = float(row[1])
+    date = row[2]
+    rows.append({"Date": date, "ServiceName": service_name, "Cost": cost})
+
+df = pd.DataFrame(rows)
+display(df)
+```
+
+## Step 4: (Optional) Save to Delta Lake
+
+```python
+# Save the data to Delta Lake for further analysis
+spark_df = spark.createDataFrame(df)
+spark_df.write.mode("overwrite").saveAsTable("azure_cost_data")
+```
+
+## Alternative Approach: Using Consumption API
+
+For more detailed data, you can use the Consumption API:
+
+```python
+from azure.mgmt.consumption import ConsumptionManagementClient
+
+consumption_client = ConsumptionManagementClient(credentials, subscription_id)
+usage_details = consumption_client.usage_details.list(scope=scope)
+
+# Process usage details into a DataFrame
+```
+
+## Tips for Optimization
+1. Cache frequently used cost data
+2. Schedule regular refreshes using Databricks jobs
+3. Consider using Azure Cost Management exports if you need historical data
+4. For large datasets, process in chunks
+
+Would you like me to elaborate on any specific part of this implementation?

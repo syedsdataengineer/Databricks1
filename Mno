@@ -1,0 +1,11 @@
+from azure.identity import ClientSecretCredential
+
+credential = ClientSecretCredential(
+    tenant_id="11db217-26e-400a-8ba0-57dcc127d72d",
+    client_id="ee529c5e-7f43-4a03-bdc4-6b2304704741",
+    client_secret="YOUR_SECRET"
+)
+
+# Should print your correct tenant ID
+token = credential.get_token("https://management.azure.com/.default")
+print("Authenticated to tenant:", token._tenant_id)

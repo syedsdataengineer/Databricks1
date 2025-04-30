@@ -1,0 +1,77 @@
+import requests
+import base64
+from datetime import datetime, timedelta
+from pyspark.sql import SparkSession
+
+# === CONFIG ===
+organization = "your_org"
+project = "your_project"
+pat = "your_pat"
+
+# === AUTH HEADER ===
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Basic ' + base64.b64encode((':' + pat).encode()).decode()
+}
+
+# === DATE RANGE CONFIG ===
+start_date = datetime(2022, 1, 1)
+end_date = datetime(2024, 12, 31)
+step = timedelta(days=30)
+
+# === INIT WORK ITEM ID LIST ===
+all_work_item_ids = []
+
+# === PAGINATED ID FETCHING ===
+while start_date < end_date:
+    next_date = start_date + step
+    wiql_url = f"https://dev.azure.com/{organization}/{project}/_apis/wit/wiql?api-version=7.0"
+    wiql_query = {
+        "query": f"""
+        SELECT [System.Id] FROM WorkItems 
+        WHERE [System.TeamProject] = @project 
+        AND [System.CreatedDate] >= '{start_date.strftime('%Y-%m-%d')}' 
+        AND [System.CreatedDate] < '{next_date.strftime('%Y-%m-%d')}'
+        """
+    }
+
+    response = requests.post(wiql_url, headers=headers, json=wiql_query)
+    response.raise_for_status()
+
+    ids = [item["id"] for item in response.json().get("workItems", [])]
+    all_work_item_ids.extend(ids)
+
+    print(f"Fetched {len(ids)} IDs from {start_date.date()} to {next_date.date()}")
+    start_date = next_date
+
+# === FETCH WORK ITEM DETAILS IN BATCHES ===
+all_work_items = []
+batch_size = 200
+
+for i in range(0, len(all_work_item_ids), batch_size):
+    batch_ids = ",".join(map(str, all_work_item_ids[i:i + batch_size]))
+    items_url = f"https://dev.azure.com/{organization}/_apis/wit/workitems?ids={batch_ids}&$expand=all&api-version=7.0"
+
+    item_response = requests.get(items_url, headers=headers)
+    item_response.raise_for_status()
+
+    items = item_response.json().get("value", [])
+    all_work_items.extend(items)
+
+    print(f"Fetched details for batch {i // batch_size + 1}")
+
+# === FLATTEN FIELDS FOR DATAFRAME ===
+def flatten_item(item):
+    flat = {"id": item.get("id")}
+    for k, v in item.get("fields", {}).items():
+        flat[k.replace('.', '_')] = v
+    return flat
+
+flattened = [flatten_item(item) for item in all_work_items]
+
+# === CONVERT TO SPARK DATAFRAME ===
+spark = SparkSession.builder.getOrCreate()
+df = spark.createDataFrame(flattened)
+
+# === DISPLAY IN DATABRICKS ===
+display(df)

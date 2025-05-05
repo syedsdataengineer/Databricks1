@@ -1,0 +1,17 @@
+Supported notification destinations:
+	•	Email
+	•	Microsoft Teams
+	•	PagerDuty
+	•	Slack
+	•	Webhook
+	•	Notification triggers available:
+	•	Start – when the job begins
+	•	Success – when the job completes successfully
+	•	Failure – when the job fails (selected in the screenshot)
+	•	Duration warning – when job execution exceeds expected time
+	•	Streaming backlog – when streaming job backlog increases abnormally
+	•	Destination dropdown: You can select where to send notifications (e.g., email, Teams, etc.)
+	•	Additional options:
+	•	Mute notifications for skipped runs
+	•	Mute notifications for canceled runs
+	•	Add notification button: Allows adding multiple destinations with different trigger types.

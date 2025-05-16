@@ -1,0 +1,88 @@
+Slide 1: Title Slide (Already Good)
+
+Title:
+Modernizing Government Data Operations with Databricks, AWS, and Terraform
+
+Subtitle:
+Automated Cost Tracking & Seamless Agency Onboarding
+
+⸻
+
+Slide 2: Project Overview
+	•	Purpose: Centralize and automate onboarding for agencies
+	•	Built on Databricks + AWS with Terraform
+	•	Empower agencies to track cloud usage, cost, and data access
+
+⸻
+
+Slide 3: Cloud-Native Architecture
+	•	Show VPC + PrivateLink + Databricks Workspace
+	•	Terraform automates the infrastructure
+	•	Secure, scalable, and reusable
+
+Visual: Network + cloud architecture diagram (I can help generate it)
+
+⸻
+
+Slide 4: Data Ingestion Pipeline
+	•	APIs ingest cost and usage data from agencies
+	•	Streamlined into Bronze/Silver/Gold (Medallion architecture)
+
+Value: Live agency-level visibility and accountability
+
+Visual: Flow diagram — API → Delta Tables → Dashboard
+
+⸻
+
+Slide 5: Medallion Architecture in Action
+	•	Bronze: Raw usage
+	•	Silver: Cleaned, structured
+	•	Gold: Cost by agency/service/time
+
+Benefit: Clear traceability and report-ready insights
+
+⸻
+
+Slide 6: Unity Catalog for Governance
+	•	Secure, governed data access
+	•	Row/column level security per agency
+	•	Audit-ready and compliant
+
+Visual: Unity Catalog hierarchy or data access matrix
+
+⸻
+
+Slide 7: Terraform Automation
+	•	Code deploys VPC, PrivateLink, Databricks, Unity Catalog
+	•	Agency-specific environments in minutes
+	•	No manual errors or inconsistencies
+
+Visual: Terraform flow or HCL code screenshot snippet
+
+⸻
+
+Slide 8: Dashboard & Reporting
+	•	Agency-level usage, cost breakdown, and service trends
+	•	Supports budgeting and accountability
+
+Visual: Screenshot of your dashboard or mockup of KPI tiles
+
+⸻
+
+Slide 9: Key Benefits for Agencies
+	•	Faster onboarding
+	•	Real-time cost tracking
+	•	Strong governance
+	•	Data-driven decisions
+
+Visual: Use the “Benefits for Agencies” image from earlier
+
+⸻
+
+Slide 10: Roadmap & Vision
+	•	Integrate with budgeting tools
+	•	Add real-time alerting
+	•	Expand to analytics & ML use cases
+	•	Multi-agency collaboration
+
+Visual: Roadmap timeline or icons representing future phases

@@ -1,3 +1,24 @@
+Supports Agency Onboarding:
+- Centralized, governed data platform
+- Easy discovery with Unity Catalog
+- Clean, structured data available instantly
+- Secure access for each agency
+
+
+Accelerates Agency Onboarding:
+- Rapid, automated deployment
+- Pre-secured, compliant environments
+- No manual setup or errors
+- Tracks agency-level resource usage
+
+
+
+
+
+
+
+
+
 Slide 1: Title Slide (Already Good)
 
 Title:

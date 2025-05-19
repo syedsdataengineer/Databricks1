@@ -1,0 +1,19 @@
+variable "compliance_security_profile_workspace" {
+  type = object({
+    is_enabled           = bool
+    compliance_standards = list(string)
+  })
+  default = {
+    is_enabled           = false
+    compliance_standards = []
+  }
+  description = "Enable compliance security profile and specify standards"
+}
+
+
+
+
+compliance_security_profile_workspace = {
+  is_enabled           = true
+  compliance_standards = ["HIPAA", "FEDRAMP_MODERATE"]
+}

@@ -1,0 +1,48 @@
+Working Session Script: Azure Cost API Ingestion and Transformation in Databricks
+
+Introduction:
+“Hi everyone, today I’ll be walking you through our automated pipeline for ingesting Azure cost data into Databricks using the Azure Cost Management API. This process helps us track resource consumption, optimize costs, and generate meaningful insights across services, resource groups, and meter categories.”
+
+⸻
+
+Step 1: Authentication & Setup
+“We begin by importing the required libraries: requests, azure.identity, json, datetime, and dateutil. We use ClientSecretCredential to authenticate against Azure using a registered app in Azure AD, with the client ID, tenant ID, and secret securely stored in Databricks secrets.”
+
+⸻
+
+Step 2: Generating the Access Token
+“Using the credentials, we generate an access token via the Azure Identity library, scoped to the management endpoint (https://management.azure.com/.default). This token is then used in our API headers to securely call the Azure Cost Management endpoint.”
+
+⸻
+
+Step 3: Constructing the API Request
+“We define the time frame for the cost data dynamically — the current date as end_date and start_date as 11 months before — and build a request body that retrieves ActualCost by day, aggregated by PreTaxCost, and grouped by ServiceName, ResourceGroup, and MeterCategory.”
+
+⸻
+
+Step 4: Making the API Call
+“We perform a POST request to the cost management API using the constructed URL and headers. The response is parsed to extract rows and columns. Pagination is also handled via nextLink to retrieve the full result set across multiple pages.”
+
+⸻
+
+Step 5: Creating the DataFrame
+“The extracted data is stored in a Pandas DataFrame, which is then previewed and saved locally as a CSV file (azure_cost_data.csv). This allows for easy backup, inspection, or audit purposes.”
+
+⸻
+
+Step 6: Loading Data into Delta Lake
+“In the transformation notebook, we read the CSV data or the generated DataFrame and write it into a managed Delta table under our silver layer — specifically:
+watech_aid_edp_sh.azure_cost.azure_cost_daily_silver.”
+
+⸻
+
+Step 7: Data Formatting and Transformation
+“Using PySpark, we clean and transform the data:
+	•	Convert the UsageDate into a proper date format
+	•	Rename fields
+	•	Display and validate the final structure of the DataFrame for downstream use in dashboards or reporting.”
+
+⸻
+
+Closing:
+“This pipeline is scheduled and runs monthly, and it’s integrated with job notifications and Git for future version control. It ensures secure, reliable, and repeatable ingestion of Azure cost data, helping us monitor cloud spend effectively.”

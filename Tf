@@ -1,0 +1,7 @@
+resource "databricks_metastore_assignment" "workspace_binding" {
+  for_each = module.workspace_collection
+
+  metastore_id         = var.unity_catalog_metastore_id
+  workspace_id         = each.value.workspace_id
+  default_catalog_name = "hive_metastore"
+}

@@ -5,3 +5,32 @@ resource "databricks_metastore_assignment" "workspace_binding" {
   workspace_id         = each.value.workspace_id
   default_catalog_name = "hive_metastore"
 }
+
+
+
+resource "databricks_mws_permission_assignment" "workspace_admins_group" {
+  for_each     = module.workspace_collection
+  workspace_id = each.value.workspace_id
+  principal_id = var.admin_group_id
+  permissions  = ["ADMIN"]
+}
+
+resource "databricks_mws_permission_assignment" "workspace_admins_user" {
+  for_each     = module.workspace_collection
+  workspace_id = each.value.workspace_id
+  principal_id = var.admin_user_id
+  permissions  = ["ADMIN"]
+}
+
+
+
+variable "admin_group_id" {
+  description = "The Databricks group ID to assign as admin for each workspace"
+  type        = string
+}
+
+variable "admin_user_id" {
+  description = "The Databricks user ID to assign as admin for each workspace"
+  type        = string
+}
+

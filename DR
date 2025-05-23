@@ -1,0 +1,111 @@
+Databricks Disaster Recovery Plan
+
+This document outlines the key scenarios that impact data reliability and availability in Databricks, and provides verified disaster recovery solutions based on Databricks documentation.
+
+⸻
+
+1. Accidental Deletion
+
+Accidental deletion of data in Bronze, Silver, or Gold layers can occur due to human error or automated jobs.
+
+Recovery Measures:
+	•	Enable Delta Lake Time Travel to access previous versions of the data.
+	•	Set a suitable value for delta.deletedFileRetentionDuration to allow rollback within a defined window.
+	•	Use Unity Catalog to enforce access controls, reducing risk of unauthorized deletions.
+
+Source:
+https://docs.databricks.com/en/delta/delta-utility.html#time-travel
+https://docs.databricks.com/en/data-governance/unity-catalog/index.html
+
+⸻
+
+2. Pipeline Failure During Write
+
+Pipeline failures can result in partial writes or corrupted data in Delta tables.
+
+Recovery Measures:
+	•	Delta Lake guarantees atomic write operations for consistent state.
+	•	Use write audit logs to monitor data writes.
+	•	Apply overwriteSchema with caution to avoid unintended changes.
+
+Source:
+https://docs.databricks.com/en/delta/delta-data-reliability.html
+
+⸻
+
+3. Data Outage from Source System
+
+External systems may stop sending data or may send malformed data.
+
+Recovery Measures:
+	•	Implement data quality checks to detect issues early.
+	•	Configure monitoring and alerting on data streams.
+	•	Use fallback mechanisms for handling malformed data.
+
+Source:
+https://docs.databricks.com/en/observability/monitor-streaming.html
+
+⸻
+
+4. Checkpoint Corruption
+
+Structured Streaming jobs may fail to restart properly due to corrupted or missing checkpoint files.
+
+Recovery Measures:
+	•	Use persistent and version-controlled checkpoint directories.
+	•	Monitor streaming job health using Databricks streaming metrics.
+
+Source:
+https://docs.databricks.com/en/structured-streaming/checkpointing.html
+
+⸻
+
+5. Schema Evolution Mismatch
+
+Incompatible schema updates may lead to broken transformations and failed jobs.
+
+Recovery Measures:
+	•	Use schema enforcement to ensure data conforms to expectations.
+	•	Test schema changes using Auto Loader or mergeSchema in lower environments before promotion.
+
+Source:
+https://docs.databricks.com/en/delta/delta-schema.html
+
+⸻
+
+6. Metadata/Table Inconsistency
+
+Manual edits or failed operations can result in metadata that does not match actual table structures.
+
+Recovery Measures:
+	•	Use Unity Catalog for centralized and audited metadata management.
+	•	Validate schema consistency using catalog APIs.
+
+Source:
+https://docs.databricks.com/en/data-governance/unity-catalog/index.html
+
+⸻
+
+7. Expired Retention Policies
+
+Improper retention configurations may result in permanent data loss.
+
+Recovery Measures:
+	•	Set retention values via delta.logRetentionDuration and delta.deletedFileRetentionDuration.
+	•	Avoid aggressive or frequent use of VACUUM.
+
+Source:
+https://docs.databricks.com/en/delta/delta-utility.html#vacuum
+
+⸻
+
+8. Partial Restore Failure
+
+Data restoration from outages or reruns may be incomplete.
+
+Recovery Measures:
+	•	Use checkpointing for recovery in structured streaming jobs.
+	•	Confirm successful restores using audit logs and monitoring.
+
+Source:
+https://docs.databricks.com/en/security/disaster-recovery.html

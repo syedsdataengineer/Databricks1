@@ -1,8 +1,8 @@
 from pyspark.sql.functions import col, when
 from pyspark.sql.types import IntegerType
 
-# Read scenarios table
-scenarios = spark.table("`watech_aid_edp_sh`.`watech-aid-edp-entity-resolution.watech_mvd_scenarios`") \
+# Fix cast in scenarios
+scenarios = spark.table("`watech_aid_edp_sh`.`watech-aid-edp-entity-resolution.watech_mwd_scenarios`")\
     .withColumn(
         "scenario_distorted",
         when(col("index").rlike("^[0-9]+$"), col("index").cast(IntegerType())).otherwise(None)
@@ -11,7 +11,7 @@ scenarios = spark.table("`watech_aid_edp_sh`.`watech-aid-edp-entity-resolution.w
 # Union and join
 stats = stats1.unionByName(stats2).join(scenarios, "scenario_distorted")
 
-# Filter using col() expressions, not dict access
+# Filter
 stats = stats.filter(
     (~(col("row_index_distorted") % 2 == 1)) &
     (
@@ -21,7 +21,7 @@ stats = stats.filter(
     )
 )
 
-# Save the table (with backticks!)
+# Save with backtick
 stats.write \
     .mode("overwrite") \
     .option("overwriteSchema", "true") \

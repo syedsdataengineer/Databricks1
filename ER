@@ -1,0 +1,7 @@
+from pyspark.sql.functions import col, when
+from pyspark.sql.types import IntegerType
+
+scenarios = spark.table("watech_aid_edp_sh.watech-aid-edp-entity-resolution.watech_mvd_scenarios") \
+    .withColumn("scenario_distorted", when(col("index").rlike("^[0-9]+$"), col("index").cast(IntegerType())).otherwise(None))
+
+# Continue with your join and filter logic

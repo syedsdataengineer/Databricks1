@@ -1,14 +1,27 @@
 from pyspark.sql.functions import col, when
 from pyspark.sql.types import IntegerType
 
-scenarios = spark.table("watech_aid_edp_sh.watech-aid-edp-entity-resolution.watech_mvd_scenarios") \
-    .withColumn("scenario_distorted", when(col("index").rlike("^[0-9]+$"), col("index").cast(IntegerType())).otherwise(None))
+# Read scenarios table
+scenarios = spark.table("`watech_aid_edp_sh`.`watech-aid-edp-entity-resolution.watech_mvd_scenarios`") \
+    .withColumn(
+        "scenario_distorted",
+        when(col("index").rlike("^[0-9]+$"), col("index").cast(IntegerType())).otherwise(None)
+    )
 
-# Continue with your join and filter logic
+# Union and join
+stats = stats1.unionByName(stats2).join(scenarios, "scenario_distorted")
 
+# Filter using col() expressions, not dict access
+stats = stats.filter(
+    (~(col("row_index_distorted") % 2 == 1)) &
+    (
+        (col("index") == "61") |
+        (col("index") == "62") |
+        (col("index") == "63")
+    )
+)
 
-
-
+# Save the table (with backticks!)
 stats.write \
     .mode("overwrite") \
     .option("overwriteSchema", "true") \

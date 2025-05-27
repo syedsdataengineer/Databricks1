@@ -5,3 +5,11 @@ scenarios = spark.table("watech_aid_edp_sh.watech-aid-edp-entity-resolution.wate
     .withColumn("scenario_distorted", when(col("index").rlike("^[0-9]+$"), col("index").cast(IntegerType())).otherwise(None))
 
 # Continue with your join and filter logic
+
+
+
+
+stats.write \
+    .mode("overwrite") \
+    .option("overwriteSchema", "true") \
+    .saveAsTable("`watech_aid_edp_sh`.`watech-aid-edp-entity-resolution.stats_rblev_beta`")

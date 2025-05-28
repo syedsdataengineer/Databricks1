@@ -1,3 +1,19 @@
+from pyspark.sql.functions import col
+
+# Force index and row_index_distorted to string type
+stats = stats.withColumn("index", col("index").cast("string"))
+stats = stats.withColumn("row_index_distorted", col("row_index_distorted").cast("string"))
+
+# Write to the table
+stats.write.mode("overwrite").saveAsTable("watch_aid_edp_sh.watch-aid-edp-entity-resolution.stats_rblev_beta12")
+
+
+
+
+
+
+
+
 from pyspark.sql.functions import regexp_replace, col
 scenarios_clean = scenarios.withColumn(
     "index_clean",

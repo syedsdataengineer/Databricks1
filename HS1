@@ -1,0 +1,46 @@
+def query_validation(
+    self,
+    template_replacements: dict[str, str] | None = None,
+    yaml_filename: str = "query_validation.yaml",
+    fail_fast: bool = True,
+) -> bool:
+    file_path = os.path.join(os.path.dirname(inspect.stack()[1].filename), yaml_filename)
+
+    with open(file_path, encoding="UTF-8") as file:
+        df = pd.json_normalize(safe_load(file))
+
+    result = True
+    hard_failure_detected = False
+
+    for _, row in df.iterrows():
+        name: str = row["name"]
+        sql: str = row["sql"]
+        condition: str = row["condition"]
+        hard_failure: bool = row["hard_failure"]
+
+        if template_replacements:
+            for key, value in template_replacements.items():
+                name = name.replace(f"{{{{{key}}}}}", value)
+                sql = sql.replace(f"{{{{{key}}}}}", value)
+                condition = condition.replace(f"{{{{{key}}}}}", value)
+
+        single_result = self.single_query_validation(
+            name=name,
+            sql=sql,
+            condition=condition,
+            should_match=row["should_match"],
+            should_raise=hard_failure,
+            fail_fast=fail_fast,
+            source_type=row.get("source_type", "spark"),
+        )
+
+        if not single_result:
+            result = single_result
+
+        if not single_result and row["hard_failure"]:
+            hard_failure_detected = single_result
+
+    if not hard_failure_detected:
+        raise AssertionError("PLV Failed")
+
+    return result

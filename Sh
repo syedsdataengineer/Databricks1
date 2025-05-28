@@ -8,3 +8,14 @@ apt-get update
 
 # Install Tesseract OCR and Poppler utilities
 apt-get install -y tesseract-ocr poppler-utils
+
+
+
+
+
+databricks fs cp /Volumes/watech_aid_edp_sh/cluster_config/config_sh_files/stacycluster.sh dbfs:/databricks/init-scripts/stacycluster.sh
+
+
+
+
+dbfs:/databricks/init-scripts/stacycluster.sh

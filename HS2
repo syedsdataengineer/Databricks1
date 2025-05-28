@@ -1,0 +1,81 @@
+def single_query_validation(
+    self,
+    name: str,
+    sql: str,
+    should_match: bool,
+    condition: Column | str,
+    should_raise: bool = True,
+    fail_fast: bool = True,
+    source_type: str = "spark",
+) -> bool:
+    logging.info(f"Query result validation starting: {name}")
+    issue_level = logging.ERROR if should_raise else logging.WARN
+    result = True
+
+    df = self._read_sql_from_database(sql=sql, source_type=source_type)
+    initial_count = df.count()
+
+    if initial_count == 0:
+        result = False
+        message = f"The validation query resulted in an empty dataset: {sql}"
+        record_count_message = f"Query result validation record count: {name}, {initial_count}"
+        logging.log(issue_level, message)
+    else:
+        df = df.where(condition)
+        filtered_count = df.count()
+
+        if should_match:
+            if filtered_count != initial_count:
+                result = False
+                message = (
+                    f"Expected all columns to match condition. "
+                    f"{filtered_count} of {initial_count} matched."
+                )
+                logging.log(issue_level, message)
+        elif filtered_count > 0:
+            result = False
+            message = (
+                f"Expected no columns to match condition. "
+                f"{filtered_count} of {initial_count} matched."
+            )
+            logging.log(issue_level, message)
+
+        record_count_message = f"Query result validation record count: {name}, {filtered_count}"
+
+    run_date = datetime.now()
+    new_reporting_date = datetime.strptime(REPORTING_DATE, format="%Y-%m").date()
+    df = self.spark.createDataFrame([
+        {
+            "run_date": run_date,
+            "new_reporting_date": new_reporting_date,
+            "self.name": self.name,
+            "name": name,
+            "result": result,
+            "sql": sql,
+            "condition": condition,
+            "should_match": should_match,
+            "should_raise": should_raise,
+            "source_type": source_type,
+        }
+    ], QueryValidation.schema())
+
+    self._write_delta_table(
+        df=df,
+        table_mapping=QueryValidation,
+        mode="append",
+        audit=False,
+        send_outlier_alert=False,
+        optimize=False,
+        analyze=False,
+    )
+
+    if not result:
+        logging.log(issue_level, f"Query result validation failed: {name}")
+        logging.log(issue_level, record_count_message)
+        if fail_fast and should_raise:
+            raise AssertionError(message)
+    else:
+        logging.info(f"Query result validation succeeded: {name}")
+        logging.info(record_count_message)
+
+    return result

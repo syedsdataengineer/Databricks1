@@ -1,0 +1,10 @@
+#!/bin/bash
+# Redirect output to log file for debugging
+exec >> /databricks/driver/init-script.log 2>&1
+set -x  # Print commands as they’re run
+
+# Update the package index
+apt-get update
+
+# Install Tesseract OCR and Poppler utilities
+apt-get install -y tesseract-ocr poppler-utils

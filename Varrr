@@ -1,0 +1,15 @@
+variable "sg_egress_protocol" {
+  type        = list(string)
+  description = "List of egress protocols to use in security group rules"
+  default     = ["tcp", "udp"]
+}
+
+
+
+variable "sg_ingress_protocol" {
+  type        = list(string)
+  description = "List of ingress protocols"
+  default     = ["tcp", "udp"]
+}
+
+

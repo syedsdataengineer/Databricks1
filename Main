@@ -90,4 +90,14 @@ resource "local_file" "deployment_information" {
     "allow_list"     = concat(each.value.allow_list, ["${data.http.my.body}/32"])
   })
   filename = "./artifacts/${each.key}.json"
+
+
 }
+
+
+
+
+
+
+relay_vpce_id = [for k, v in databricks_mws_vpc_endpoint.relay : v.vpc_endpoint_id]
+rest_vpce_id  = [for k, v in databricks_mws_vpc_endpoint.backend_rest_vpce : v.vpc_endpoint_id]

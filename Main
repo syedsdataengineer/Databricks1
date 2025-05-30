@@ -1,0 +1,93 @@
+resource "random_string" "naming" {
+  special = false
+  upper   = false
+  length  = 6
+}
+
+locals {
+  prefix              = "adi-aws-resources"
+  sg_egress_ports     = [443, 3306, 6666]
+  sg_ingress_protocol = ["tcp", "udp"]
+  sg_egress_protocol  = ["tcp", "udp"]
+  workspace_confs = {
+    workspace_1 = var.workspace_1_config
+    workspace_2 = var.workspace_2_config
+  }
+}
+
+module "databricks_cmk" {
+  source                 = "./modules/databricks_cmk"
+  cross_account_role_arn = aws_iam_role.cross_account_role.arn
+  resource_prefix        = local.prefix
+  region                 = var.region
+  cmk_admin              = var.cmk_admin
+}
+
+# 🔹 Create separate VPC for each workspace
+module "workspace_vpcs" {
+  for_each                  = local.workspace_confs
+  source                    = "./modules/vpc"
+  vpc_cidr                  = each.value.vpc_cidr
+  public_subnets_cidr       = each.value.public_subnets_cidr
+  privatelink_subnets_cidr  = each.value.privatelink_subnets_cidr
+  prefix                    = each.value.prefix
+  tags                      = each.value.tags
+}
+
+# 🔹 Create workspace collection - using new VPCs & existing PrivateLink endpoints
+module "workspace_collection" {
+  for_each = local.workspace_confs
+
+  providers = {
+    databricks = databricks.mws
+    aws        = aws
+  }
+
+  source                = "./modules/mws_workspace"
+  databricks_account_id = var.databricks_account_id
+  credentials_id        = databricks_mws_credentials.this.credentials_id
+  prefix                = each.value.prefix
+  region                = each.value.region
+  workspace_name        = each.value.workspace_name
+  tags                  = each.value.tags
+
+  existing_vpc_id       = module.workspace_vpcs[each.key].vpc_id
+  nat_gateways_id       = module.workspace_vpcs[each.key].nat_gateway_ids[0]
+  security_group_ids    = [module.workspace_vpcs[each.key].security_group_id]
+  private_subnet_pair   = [each.value.private_subnet_pair.subnet1_cidr, each.value.private_subnet_pair.subnet2_cidr]
+  workspace_storage_cmk = module.databricks_cmk.workspace_storage_cmk
+  managed_services_cmk  = module.databricks_cmk.managed_services_cmk
+  root_bucket_name      = each.value.root_bucket_name
+
+  # 🚀 Reuse existing shared PrivateLink endpoints
+  relay_vpce_id         = [databricks_mws_vpc_endpoint.relay.vpc_endpoint_id]
+  rest_vpce_id          = [databricks_mws_vpc_endpoint.backend_rest_vpce.vpc_endpoint_id]
+
+  depends_on = [
+    databricks_mws_vpc_endpoint.relay,
+    databricks_mws_vpc_endpoint.backend_rest_vpce
+  ]
+}
+
+data "http" "my" {
+  url = "https://ifconfig.me"
+}
+
+# 🔹 Save deployment info to local file
+resource "local_file" "deployment_information" {
+  for_each = local.workspace_confs
+
+  content = jsonencode({
+    "prefix"         = "${each.value.prefix}-${local.prefix}"
+    "workspace_url"  = module.workspace_collection[each.key].workspace_url
+    "vpc_id"         = module.workspace_vpcs[each.key].vpc_id
+    "public_subnets" = module.workspace_vpcs[each.key].public_subnet_ids
+    "private_subnets"= module.workspace_vpcs[each.key].privatelink_subnet_ids
+    "security_group" = module.workspace_vpcs[each.key].security_group_id
+    "relay_vpce_id"  = databricks_mws_vpc_endpoint.relay.vpc_endpoint_id
+    "rest_vpce_id"   = databricks_mws_vpc_endpoint.backend_rest_vpce.vpc_endpoint_id
+    "block_list"     = each.value.block_list
+    "allow_list"     = concat(each.value.allow_list, ["${data.http.my.body}/32"])
+  })
+  filename = "./artifacts/${each.key}.json"
+}

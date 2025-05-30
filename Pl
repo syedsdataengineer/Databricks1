@@ -1,0 +1,109 @@
+# Loop over each workspace to create a separate PrivateLink Security Group
+resource "aws_security_group" "privatelink" {
+  for_each = module.workspace_vpcs
+
+  vpc_id = each.value.vpc_id
+
+  ingress {
+    description     = "Inbound rules 443"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [each.value.security_group_id]
+  }
+
+  ingress {
+    description     = "Inbound rules 6666"
+    from_port       = 6666
+    to_port         = 6666
+    protocol        = "tcp"
+    security_groups = [each.value.security_group_id]
+  }
+
+  egress {
+    description     = "Outbound rules 443"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [each.value.security_group_id]
+  }
+
+  egress {
+    description     = "Outbound rules 6666"
+    from_port       = 6666
+    to_port         = 6666
+    protocol        = "tcp"
+    security_groups = [each.value.security_group_id]
+  }
+
+  tags = {
+    Name = "${each.key}-privatelink-sg"
+  }
+}
+
+# Create VPC Endpoints for each workspace
+resource "aws_vpc_endpoint" "backend_rest" {
+  for_each = module.workspace_vpcs
+
+  vpc_id            = each.value.vpc_id
+  service_name      = var.workspace_vpce_service
+  vpc_endpoint_type = "Interface"
+  security_group_ids = [aws_security_group.privatelink[each.key].id]
+  subnet_ids        = each.value.privatelink_subnet_ids
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${each.key}-databricks-backend-rest"
+  }
+}
+
+resource "aws_vpc_endpoint" "backend_relay" {
+  for_each = module.workspace_vpcs
+
+  vpc_id            = each.value.vpc_id
+  service_name      = var.relay_vpce_service
+  vpc_endpoint_type = "Interface"
+  security_group_ids = [aws_security_group.privatelink[each.key].id]
+  subnet_ids        = each.value.privatelink_subnet_ids
+  private_dns_enabled = true
+
+  tags = {
+    Name = "${each.key}-databricks-backend-relay"
+  }
+}
+
+# Register the endpoints in Databricks MWS
+resource "databricks_mws_vpc_endpoint" "backend_rest_vpce" {
+  for_each           = module.workspace_vpcs
+  provider           = databricks.mws
+  account_id         = var.databricks_account_id
+  aws_vpc_endpoint_id = aws_vpc_endpoint.backend_rest[each.key].id
+  vpc_endpoint_name  = "${each.key}-vpc-backend"
+  region             = var.region
+}
+
+resource "databricks_mws_vpc_endpoint" "relay" {
+  for_each           = module.workspace_vpcs
+  provider           = databricks.mws
+  account_id         = var.databricks_account_id
+  aws_vpc_endpoint_id = aws_vpc_endpoint.backend_relay[each.key].id
+  vpc_endpoint_name  = "${each.key}-vpc-relay"
+  region             = var.region
+}
+
+
+
+
+
+
+output "vpc_id" {
+  value = aws_vpc.mainvpc.id
+}
+
+output "security_group_id" {
+  value = aws_security_group.sg.id
+}
+
+output "privatelink_subnet_ids" {
+  value = aws_subnet.privatelink[*].id
+}

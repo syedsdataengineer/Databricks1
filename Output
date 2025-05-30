@@ -1,0 +1,24 @@
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_vpc.mainvpc.id
+}
+
+output "public_subnet_ids" {
+  description = "Public subnet IDs"
+  value       = aws_subnet.public_subnets[*].id
+}
+
+output "privatelink_subnet_ids" {
+  description = "PrivateLink subnet IDs"
+  value       = aws_subnet.privatelink[*].id
+}
+
+output "security_group_id" {
+  description = "Security group ID"
+  value       = aws_security_group.sg.id
+}
+
+output "nat_gateway_ids" {
+  description = "NAT gateway IDs"
+  value       = aws_nat_gateway.nat_gateways[*].id
+}

@@ -1,0 +1,74 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  TF_VERSION: '1.5.7'
+  AWS_REGION: 'us-west-2'
+
+stages:
+# ------------------ CI Stage: Terraform Plan ------------------
+- stage: Plan
+  jobs:
+    - job: TerraformPlan
+      displayName: "Terraform Init & Plan"
+      steps:
+
+        - script: |
+            echo "Installing Terraform..."
+            curl -O https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+            unzip terraform_${TF_VERSION}_linux_amd64.zip
+            sudo mv terraform /usr/local/bin/
+            terraform version
+          displayName: 'Install Terraform CLI'
+
+        - script: |
+            terraform init -backend-config="bucket=watech-aid-edp-tf-remote-state-bucket" \
+                           -backend-config="key=global/rco/terraform.tfstate" \
+                           -backend-config="region=us-west-2"
+          env:
+            AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+            AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+            AWS_DEFAULT_REGION: $(AWS_REGION)
+          displayName: 'Terraform Init'
+
+        - script: |
+            terraform plan -var-file="terraform.tfvars" -out=tfplan.out
+          env:
+            AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+            AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+            AWS_DEFAULT_REGION: $(AWS_REGION)
+          displayName: 'Terraform Plan'
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+            targetPath: '$(System.DefaultWorkingDirectory)/tfplan.out'
+            artifactName: 'tfplan'
+            publishLocation: 'pipeline'
+
+# ------------------ CD Stage: Terraform Apply (after approval) ------------------
+- stage: Apply
+  dependsOn: Plan
+  condition: succeeded()
+  jobs:
+    - deployment: DeployInfra
+      displayName: 'Terraform Apply'
+      environment: 'prod'   # Optional: Create environment for manual approval
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+              - download: current
+                artifact: tfplan
+
+              - script: |
+                  terraform apply tfplan.out
+                env:
+                  AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+                  AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+                  AWS_DEFAULT_REGION: $(AWS_REGION)
+                displayName: 'Terraform Apply'

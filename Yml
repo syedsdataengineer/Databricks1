@@ -1,0 +1,34 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  AWS_REGION: 'us-west-2'
+
+steps:
+- script: |
+    echo "Installing Terraform"
+    curl -O https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
+    unzip terraform_1.5.7_linux_amd64.zip
+    sudo mv terraform /usr/local/bin/
+    terraform -version
+  displayName: 'Install Terraform'
+
+- script: |
+    terraform init -backend-config="bucket=watech-aid-edp-tf-remote-state-bucket" \
+                   -backend-config="key=global/rco/terraform.tfstate" \
+                   -backend-config="region=us-west-2"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: $(AWS_REGION)
+  displayName: 'Terraform Init'
+
+- script: |
+    terraform plan -var-file="terraform.tfvars"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: $(AWS_REGION)
+  displayName: 'Terraform Plan'

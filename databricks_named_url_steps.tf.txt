@@ -1,0 +1,46 @@
+
+# Step-by-Step Integration of Named Databricks Workspace URL
+
+## 1. Root: Add to variables.tf
+
+variable "databricks_url" {
+  description = "Named Databricks workspace URL"
+  type        = string
+}
+
+
+## 2. Root: Add to terraform.tfvars
+
+workspace_1_config = {
+  databricks_url = "https://my-secure-workspace.cloud.databricks.com"
+  # other config values...
+}
+
+
+## 3. Module: Add to modules/mws_workspace/variables.tf
+
+variable "databricks_url" {
+  description = "Named Databricks workspace URL"
+  type        = string
+}
+
+
+## 4. Module: Add to modules/mws_workspace/outputs.tf
+
+output "databricks_url" {
+  value       = var.databricks_url
+  description = "Named Databricks workspace URL"
+}
+
+
+## 5. Root: Add to outputs.tf
+
+output "workspace_named_url" {
+  value       = module.workspace_collection["workspace_1"].databricks_url
+  description = "Named Databricks workspace URL (custom alias)"
+}
+
+
+Note:
+- Do not use `databricks_url` for provider authentication.
+- Continue to use `https://accounts.cloud.databricks.com` for MWS API access.

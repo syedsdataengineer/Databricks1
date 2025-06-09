@@ -1,0 +1,81 @@
+-- File_Ingestion_Audit
+
+CREATE TABLE File_Ingestion_Audit (
+    ingestion_id        BIGINT PRIMARY KEY,
+    file_name           VARCHAR(255),
+    file_size           BIGINT,
+    record_count        INT,
+    source_system       VARCHAR(100),
+    ingestion_start_time TIMESTAMP,
+    ingestion_end_time   TIMESTAMP,
+    ingestion_status    VARCHAR(20), -- SUCCESS, FAILED, IN_PROGRESS
+    error_message       TEXT,
+    created_by          VARCHAR(50),
+    created_date        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Transformation_Audit
+
+CREATE TABLE Transformation_Audit (
+    transformation_id     BIGINT PRIMARY KEY,
+    ingestion_id          BIGINT,
+    transformation_type   VARCHAR(100),
+    source_record_count   INT,
+    transformed_record_count INT,
+    transformation_start_time TIMESTAMP,
+    transformation_end_time   TIMESTAMP,
+    transformation_status VARCHAR(20), -- SUCCESS, FAILED, IN_PROGRESS
+    error_message         TEXT,
+    created_by            VARCHAR(50),
+    created_date          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ingestion_id) REFERENCES File_Ingestion_Audit(ingestion_id)
+);
+
+-- Validation_Audit
+
+CREATE TABLE Validation_Audit (
+    validation_id         BIGINT PRIMARY KEY,
+    transformation_id     BIGINT,
+    validation_rule_name  VARCHAR(100),
+    records_validated     INT,
+    records_passed        INT,
+    records_failed        INT,
+    validation_start_time TIMESTAMP,
+    validation_end_time   TIMESTAMP,
+    validation_status     VARCHAR(20), -- SUCCESS, FAILED, IN_PROGRESS
+    error_message         TEXT,
+    created_by            VARCHAR(50),
+    created_date          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (transformation_id) REFERENCES Transformation_Audit(transformation_id)
+);
+
+-- Salesforce_Load_Audit
+
+CREATE TABLE Salesforce_Load_Audit (
+    load_id                BIGINT PRIMARY KEY,
+    validation_id          BIGINT,
+    total_records_attempted INT,
+    records_loaded_successfully INT,
+    records_failed         INT,
+    rejection_file_name    VARCHAR(255),
+    load_start_time        TIMESTAMP,
+    load_end_time          TIMESTAMP,
+    load_status            VARCHAR(20), -- SUCCESS, FAILED, PARTIAL_SUCCESS
+    error_message          TEXT,
+    created_by             VARCHAR(50),
+    created_date           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (validation_id) REFERENCES Validation_Audit(validation_id)
+);
+
+-- Rejected_Records_Detail
+
+CREATE TABLE Rejected_Records_Detail (
+    reject_id              BIGINT PRIMARY KEY,
+    load_id                BIGINT,
+    record_identifier      VARCHAR(255),
+    error_code             VARCHAR(50),
+    error_description      TEXT,
+    rejected_data          TEXT, -- Store the actual record data that failed
+    created_date           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (load_id) REFERENCES Salesforce_Load_Audit(load_id)
+);

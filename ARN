@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowTerraformIAMUserAccess",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::<ACCOUNT_ID>:user/<USER_NAME>"
+      },
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:ListBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::watech-aid-edp-tf-remote-state-bucket",
+        "arn:aws:s3:::watech-aid-edp-tf-remote-state-bucket/global/rco/terraform.tfstate"
+      ]
+    }
+  ]
+}

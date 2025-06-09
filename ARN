@@ -13,9 +13,25 @@
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::watech-aid-edp-tf-remote-state-bucket",
-        "arn:aws:s3:::watech-aid-edp-tf-remote-state-bucket/global/rco/terraform.tfstate"
+        "arn:aws:s3:::tf-remote-state-bucket",
+        "arn:aws:s3:::tf-remote-state-bucket/global/terraform.tfstate"
       ]
     }
   ]
 }
+
+
+
+
+
+- script: |
+    echo "🚀 Starting Terraform Plan with Debug Logging..."
+    export TF_LOG=DEBUG
+    terraform plan -parallelism=2 -detailed-exitcode
+  displayName: "Terraform Plan (Debug)"
+  timeoutInMinutes: 10
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_REGION: us-west-2
+

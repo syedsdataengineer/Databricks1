@@ -1,0 +1,70 @@
+variables:
+  DATABRICKS_HOST: ${DATABRICKS_HOST}
+  DATABRICKS_TOKEN: ${DATABRICKS_TOKEN}
+  SOURCE_DIR: ${SOURCE_DIR:-"./*"}           # Default to root if not specified
+  TARGET_DIR: ${TARGET_DIR:-"/Shared/"}      # Default target in Databricks
+
+stages:
+  - deploy
+
+deploy_to_databricks:
+  stage: deploy
+  image: python:3.8-slim
+
+  rules:
+    - when: always         # Will run on every push
+    - when: manual         # Also allows manual triggers
+
+  before_script:
+    - pip install --upgrade pip
+    - pip install databricks-cli
+    - apt-get update && apt-get install -y tree  # Install tree for directory listing
+    - echo "Configuring Databricks CLI..."
+    - databricks configure --token <<EOF
+        ${DATABRICKS_HOST}
+        ${DATABRICKS_TOKEN}
+      EOF
+
+  script:
+    # List and log the directory structure before deployment
+    - echo "Current directory structure:"
+    - tree ${SOURCE_DIR}
+
+    # Deploy all directories recursively
+    - echo "Starting deployment of all directories..."
+    - |
+      for dir in $(find ${SOURCE_DIR} -type d -not -path "*/\.*"); do
+        if [ "$dir" != "." ] && [ "$dir" != ".." ]; then
+          echo "Processing directory: $dir"
+          # Create corresponding directory in Databricks
+          target_path="${TARGET_DIR}${dir#./}"
+          echo "Deploying to: $target_path"
+          databricks workspace import_dir "$dir" "$target_path" --overwrite
+        fi
+      done
+
+    # Validate deployment
+    - echo "Validating deployment..."
+    - databricks workspace ls -l ${TARGET_DIR}
+
+  after_script:
+    - echo "Deployment process completed"
+    - echo "Final workspace structure:"
+    - databricks workspace ls -l ${TARGET_DIR}
+
+environment:
+  name: production
+
+retry:
+  max: 2
+  when:
+    - runner_system_failure
+    - stuck_or_timeout_failure
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .pip-cache/
+
+tags:
+  - docker

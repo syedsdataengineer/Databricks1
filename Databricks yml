@@ -68,3 +68,85 @@ cache:
 
 tags:
   - docker
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+variables:
+  DATABRICKS_HOST: ${DATABRICKS_HOST}
+  DATABRICKS_TOKEN: ${DATABRICKS_TOKEN}
+
+stages:
+  - deploy
+
+deploy_to_databricks:
+  stage: deploy
+  image: python:3.8-slim
+
+  rules:
+    - changes:
+        - notebooks/**/* 
+        - sql/**/* 
+        - python/**/*
+    - when: always
+    - when: manual  # Also allows manual triggers
+
+  before_script:
+    - pip install --upgrade pip
+    - pip install databricks-cli
+    - echo "Configuring Databricks CLI..."
+    - databricks configure --token <<EOF
+        ${DATABRICKS_HOST}
+        ${DATABRICKS_TOKEN}
+      EOF
+
+  script:
+    # Deploy notebooks
+    - echo "Deploying notebooks..."
+    - databricks workspace import_dir notebooks /Shared/notebooks --overwrite
+
+    # Deploy Python files
+    - echo "Deploying Python files..."
+    - databricks workspace import_dir python /Shared/python --overwrite
+
+    # Deploy SQL files
+    - echo "Deploying SQL files..."
+    - databricks workspace import_dir sql /Shared/sql --overwrite
+
+    # Validate deployment
+    - echo "Validating deployment..."
+    - databricks workspace ls /Shared
+
+  after_script:
+    - echo "Deployment process completed"
+
+environment:
+  name: production
+
+# Retry logic
+retry:
+  max: 2
+  when:
+    - runner_system_failure
+    - stuck_or_timeout_failure
+
+# Cache pip dependencies
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .pip-cache/
+
+# Add tags if you have specific runners
+tags:
+  - docker

@@ -1,0 +1,81 @@
+The goal of this Terraform module is to deploy Azure Databricks workspace with secure networking using Private Link, isolating the control and data planes via VNETs and private subnets. It ensures:
+	•	Secure communication through private endpoints
+	•	Restricted access to Azure services (like storage)
+	•	Custom NSGs for traffic control
+
+⸻
+
+🔌 NETWORKING STRUCTURE
+
+The module provisions three separate virtual networks:
+	1.	Transit VNet (shared or central VNet for routing or peering)
+	2.	Data Plane VNet (vnet_dp.tf) → where compute resources run (clusters)
+	3.	Control Plane VNet is implicit (managed by Azure Databricks)
+
+Each VNet contains multiple subnets, NSGs, and delegation settings.
+
+⸻
+
+📡 Transit VNet (vnet_transit.tf)
+
+This VNet hosts:
+	•	transit_public subnet (delegated to Databricks)
+	•	transit_private subnet (delegated + private endpoint enabled)
+	•	transit_plsubnet (used for private link endpoint for DBFS)
+	•	NSG rules for outbound to Azure AD and Azure Front Door
+
+🔗 Private Endpoints can be linked to:
+	•	Storage accounts
+	•	DBFS
+	•	Azure Databricks REST API if needed
+
+⸻
+
+🧠 Data Plane VNet (vnet_dp.tf)
+
+This is where Databricks compute (clusters) are deployed:
+	•	dp_public subnet: assigned to workspaces
+	•	dp_private subnet: for private cluster setup
+	•	dp_plsubnet: for private endpoints
+	•	Each subnet has delegations to Microsoft.Databricks/workspaces
+	•	Private endpoint network policies are enabled for security
+
+🔐 NSG Rules:
+	•	Allow outbound to AzureActiveDirectory for authentication
+	•	Allow outbound to AzureFrontDoor.Frontend (required by control plane)
+
+⸻
+
+🔒 Private Endpoints (private_dns_zone_*.tf)
+
+These files define:
+	•	Private endpoints for Azure resources like:
+	•	Azure Blob/File Storage (for DBFS)
+	•	Azure Relay (if used)
+	•	Azure Databricks REST APIs (optional)
+	•	Private DNS zones mapped correctly (e.g. privatelink.blob.core.windows.net)
+	•	Records for name resolution from inside VNets
+
+⸻
+
+🔄 WORKFLOW / LINKAGE
+
+1. VNet/Subnet Creation
+	•	Transit and Data Plane VNets with proper subnets (vnet_transit.tf, vnet_dp.tf)
+
+2. NSGs
+	•	Attached to subnets using azurerm_network_security_group_association
+	•	Custom rules to allow required traffic
+
+3. Private Endpoints
+	•	Created via azurerm_private_endpoint
+	•	Pointing to:
+	•	DBFS
+	•	Azure Blob for workspace storage
+	•	(Optional) Azure Relay or other services
+	•	Bound to private_dns_zone_*.tf
+
+4. Databricks Workspace
+	•	databricks_workspace.tf provisions the workspace and links it to:
+	•	Data plane subnet (dp_private or dp_public)
+	•	Private endpoint subnets

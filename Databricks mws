@@ -1,0 +1,10 @@
+resource "databricks_mws_networks" "this" {
+  account_id   = var.databricks_account_id
+  network_name = "${var.prefix}-network"
+  region       = var.region
+  vnet_id      = azurerm_virtual_network.this.id
+  subnet_ids   = [
+    azurerm_subnet.private.id,
+    azurerm_subnet.public.id
+  ]
+}

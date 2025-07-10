@@ -1,0 +1,28 @@
+from pyspark.sql import SparkSession
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("CloneTables").getOrCreate()
+
+# Source and target locations
+source_catalog = "atb_dev"
+source_schema = "default"
+
+target_catalog = "wtb_dev"
+target_schema = "default"
+
+# List all tables in the source schema
+tables = spark.sql(f"SHOW TABLES IN {source_catalog}.{source_schema}").collect()
+
+# Loop through and clone each table
+for row in tables:
+    table_name = row['tableName']
+    
+    source_table = f"{source_catalog}.{source_schema}.{table_name}"
+    target_table = f"{target_catalog}.{target_schema}.{table_name}"
+    
+    print(f"Cloning table: {source_table} → {target_table}")
+    
+    spark.sql(f"""
+        CREATE TABLE {target_table} AS
+        SELECT * FROM {source_table}
+    """)

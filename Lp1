@@ -1,0 +1,24 @@
+ ## convert date range into YYYYMM format
+## returns all months between two dates (given in YYYYMMDD format)
+def get_months_between(start_str, end_str):
+    """
+    Returns a list of all months (in YYYYMM format) between two dates
+    given in 'YYYYMMDD' format.
+    """
+    from datetime import datetime as dtm
+    from dateutil.relativedelta import relativedelta
+
+    try:
+        start_date = dtm.strptime(start_str, "%Y%m%d")
+        end_date = dtm.strptime(end_str, "%Y%m%d")
+    except ValueError:
+        raise ValueError("Dates must be in YYYYMMDD format.")
+
+    current_date = start_date.replace(day=1)
+    all_months = []
+
+    while current_date <= end_date:
+        all_months.append(current_date.strftime("%Y%m"))
+        current_date += relativedelta(months=1)
+
+    return all_months

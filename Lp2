@@ -1,0 +1,92 @@
+########################################################################
+### Date Formatting
+########################################################################
+
+## convert date range into YYYYMMDD (first day of each month)
+## returns all months between two dates (given in YYYYMMDD format)
+def get_months_between(start_str, end_str):
+    """Returns a list of all months (in YYYYMMDD format, day=01)
+    between two dates given in 'YYYYMMDD' format"""
+
+    from datetime import datetime as dtm
+    from dateutil.relativedelta import relativedelta
+
+    try:
+        start_date = dtm.strptime(start_str, "%Y%m%d")
+        end_date   = dtm.strptime(end_str, "%Y%m%d")
+    except ValueError:
+        raise ValueError("Dates must be in YYYYMMDD format.")
+
+    # use first of the month as anchor
+    current_date = start_date.replace(day=1)
+    all_months = []
+
+    while current_date <= end_date:
+        all_months.append(current_date.strftime("%Y%m%d"))
+        current_date += relativedelta(months=1)
+
+    return all_months
+
+
+
+
+
+
+def main():
+    ####################################################################
+    # CREATE SPARK SESSION
+    ####################################################################
+    spark, log = start_spark(app_name="Credit_Card_Recurring_Transactions.py")
+    log.warn("Credit_Card_Recurring_Transactions - Execution Start")
+
+    # GET ALL THE DATES WE NEED TO RUN THE CODE RELATIVE TO THE CURRENT DATE
+    log.warn("Grabbing all dates/times needed to execute code")
+    TodayDate = datetime.datetime.today().date()
+    ...
+
+
+
+
+
+
+
+    ####################################################################
+    # For backfill, we loop over a list of "fake" execution dates
+    ####################################################################
+    start_input = sys.argv[1]          # 'YYYYMMDD'
+    end_input   = sys.argv[2]          # 'YYYYMMDD'
+    log.warn(f"start: {start_input}, end: {end_input}")
+
+    execution_dates = get_months_between(start_input, end_input)
+    log.warn(f"Dates (months) considered are: {execution_dates}")
+
+
+
+
+
+
+
+
+
+
+
+    for exec_dts in execution_dates:
+
+        log.warn("Grabbing all dates/times needed to execute code - "
+                 "Running as if it were {a}".format(a=exec_dts))
+
+        # use existing helper to convert YYYYMMDD → date
+        TodayDate = int_to_date(exec_dts)
+        log.warn(f"todays_date: {TodayDate}")
+
+        # >>> from here down, keep your original code exactly the same <<<
+        # StartLag1, StopLag1, StartLag2, StopLag2, StartLag3, StopLag3
+        #   = get_run_dates(spark, TodayDate)
+        # your queries, temp tables, inserts, etc.
+        # dropTblFromLake(...) calls
+
+
+
+
+
+

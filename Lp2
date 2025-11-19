@@ -90,3 +90,45 @@ def main():
 
 
 
+
+
+
+
+
+
+import unittest
+from Credit_Card_Recurring_Transactions import get_months_between
+
+class TestGetMonthsBetween(unittest.TestCase):
+    def test_same_month(self):
+        self.assertEqual(
+            get_months_between("20240115", "20240131"),
+            ["20240101"]
+        )
+
+    def test_multiple_months(self):
+        self.assertEqual(
+            get_months_between("20231130", "20240210"),
+            ["20231101", "20231201", "20240101", "20240201"]
+        )
+
+    def test_reversed_range_raises(self):
+        with self.assertRaises(ValueError):
+            get_months_between("20240201", "20231101")
+
+    def test_invalid_format_raises(self):
+        with self.assertRaises(ValueError):
+            get_months_between("2024-01-01", "20240201")
+
+    def test_leap_year_crossing(self):
+        self.assertEqual(
+            get_months_between("20240228", "20240302"),
+            ["20240201", "20240301"]
+        )
+
+if __name__ == "__main__":
+    unittest.main()
+
+
+
+

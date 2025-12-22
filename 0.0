@@ -87,3 +87,41 @@ Phase 4: Final Assembly (Table D)
 • Table Operation: CREATE / OVERWRITE
 • Table: ucdb_chnseg_sbx.ATM_data_sbx_202511_f (Variable table_name_d)
 
+
+
+
+
+3
+
+1. The Data Sources
+The script pulls raw data from two specific tables in the aws_connect_rtl schema:
+1. aws_connect_rtl.AWS_RTL_CONTACTTRACERECORDS: The master log of all calls (Time, Contact ID, Queue).
+2. aws_connect_rtl.aws_rtl_contacttracerecords_attributes: A detailed table containing "Tags" attached to calls (like Line of Business, App Name, etc.).
+2. Sequential Process Flow (Step-by-Step)
+This script executes in 4 distinct phases. The explicit DROP commands are commented out, so the script relies on Spark's Overwrite Mode to clear out old data automatically.
+Phase 1: Extract & Pivot Attributes (Table B)
+• Goal: Create a clean staging table of calls with their specific tags attached.
+• Action:
+1. Reads the master call log and filters for INBOUND voice calls.
+2. Queries the Attributes Table three separate times to find:
+• LOB (Line of Business)
+• IVR_App (Application Name)
+• CIF_Static_Key (Customer Link)
+3. Joins these attributes back to the master call log.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.AWSIVR_202511b (Variable: table_name_b)
+Phase 2: Build the Date Map (Table DateList)
+• Goal: Figure out the "Effective Date" for every call.
+• Action: It extracts unique call timestamps from Table B and joins them with the Script 2 Output (CIF Master Date Map) to find which customer profile version applies to that specific call time.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.AWSIVR_202511_datelist (Variable: _datelist)
+Phase 3: Enrich with Customer Data (Table CIF)
+• Goal: Get the customer demographics (Household ID, Segment, etc.).
+• Action: It uses the dates from the DateList table to query the main Customer Master table (cif.cif_cstmr_mstr).
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.AWSIVR_202511_cif (Variable: _cif)
+Phase 4: Final Assembly (Table F)
+• Goal: Combine the calls with the customer data.
+• Action: It joins the Staged Call Data (Table B) with the Customer Info (Table CIF) to produce the final dataset.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.AWSIVR_202511f (Variable: _f)

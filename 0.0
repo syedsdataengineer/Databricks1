@@ -125,3 +125,48 @@ Phase 4: Final Assembly (Table F)
 • Action: It joins the Staged Call Data (Table B) with the Customer Info (Table CIF) to produce the final dataset.
 • Table Operation: CREATE / OVERWRITE
 • Table: ucdb_chnseg_sbx.AWSIVR_202511f (Variable: _f)
+
+
+
+
+external source tables
+
+1. CIF Schema (Customer Information)
+• cif.cif_a2c_info
+• Used in: Script 1 (A2C Date Map), Script 3 (ATM)
+• cif.cif_cstmr_mstr
+• Used in: Script 2 (CIF Date Map), Script 3 (ATM), Script 5 (AWS IVR)
+2. TAS Schema (Transactions)
+• tas.tas_jrnlmstr_trnsct_vw
+• Used in: Script 3 (ATM Transactions)
+3. AWS Connect RTL Schema (Call Center)
+• aws_connect_rtl.AWS_RTL_CONTACTTRACERECORDS
+• Used in: Script 5 (AWS IVR)
+• aws_connect_rtl.aws_rtl_contacttracerecords_attributes
+• Used in: Script 5 (AWS IVR)
+
+
+
+Final Active Tables
+
+
+Script 1: A2C Date Map
+• rabp.AD44238_chnseg_a2c_date_map (Final Production Table)
+• rabp.AD44238_chnseg_a2c_date_map_b (Sorted Backup)
+• ucdb_chnseg_sbx.DY_datemap_3 (Sandbox Trace)
+Script 2: CIF Master Date Map
+• rabp.AD44238_chnseg_cif_mstr_date_map (Final Production Table)
+• rabp.AD44238_chnseg_cif_mstr_date_map_202511 (Monthly Backup)
+• ucdb_chnseg_sbx.DY_datemap_3b (Sandbox Trace)
+Script 3: ATM Transactions
+(Note: No tables are dropped, so all remain)
+• ucdb_chnseg_sbx.ATM_data_sbx_202511_f (Final Output)
+• ucdb_chnseg_sbx.ATM_data_sbx_202511_cif (Customer Helper)
+• ucdb_chnseg_sbx.ATM_data_sbx_202511_datelist (Date Helper)
+• ucdb_chnseg_sbx.ATM_data_sbx_202511 (Raw Data)
+Script 5: AWS IVR Data
+(Note: No tables are dropped, so all remain)
+• ucdb_chnseg_sbx.AWSIVR_202511f (Final Output)
+• ucdb_chnseg_sbx.AWSIVR_202511_cif (Customer Helper)
+• ucdb_chnseg_sbx.AWSIVR_202511_datelist (Date Helper)
+• ucdb_chnseg_sbx.AWSIVR_202511b (Staging Data)

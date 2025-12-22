@@ -59,3 +59,31 @@ Phase 3: The Swap (Go Live)
 • Table: rabp.AD44238_chnseg_cif_mstr_date_map_temp → rabp.AD44238_chnseg_cif_mstr_date_map
 • Action: ALTER TABLE ... RENAME TO ...
 
+
+
+
+
+1
+
+Phase 1: Extract Raw Transactions (Table A)
+• Input: Source Transaction Table (tas.tas_jrnlmstr...) & Script 1 Output (A2C Date Map).
+• Action: The script pulls raw ATM transactions (filtered for Merchant Code '6011') and links them to accounts using the A2C map.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.ATM_data_sbx_202511 (Variable table_name_a)
+• Note: The explicit DROP TABLE command is commented out; the script relies on mode("overwrite").
+Phase 2: Build the Date Map (Table B)
+• Input: Table A (Raw Data) & Script 2 Output (CIF Master Date Map).
+• Action: It extracts unique transaction dates from the raw data and finds the matching "effective date" for the customer profile.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.ATM_data_sbx_202511_datelist (Variable table_name_b)
+Phase 3: Enrich with Customer Data (Table C)
+• Input: Table B (Date List) & Customer Master (cif.cif_cstmr_mstr).
+• Action: It uses the dates from Table B to look up specific customer details (Household ID, Segment, Client Type) from the master table.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.ATM_data_sbx_202511_cif (Variable table_name_c)
+Phase 4: Final Assembly (Table D)
+• Input: Table A (Raw Transactions) & Table C (Customer Info).
+• Action: It joins the raw transactions with the enriched customer details to create the final dataset.
+• Table Operation: CREATE / OVERWRITE
+• Table: ucdb_chnseg_sbx.ATM_data_sbx_202511_f (Variable table_name_d)
+

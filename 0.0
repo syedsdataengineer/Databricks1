@@ -27,3 +27,35 @@ Phase 5: Final Commit
 2. TABLE CREATED: The final, sorted table is recreated from the backup.
 • Table: rabp.AD44238_chnseg_a2c_date_map
 • Action: saveAsTable (from _b table)
+
+
+
+
+
+0.1
+
+
+
+Sequential Process Flow (Script 2)
+Phase 1: Calculation & Monthly Backup
+1. Operation (Data Generation): The script generates a calendar for a specific month (e.g., Nov 2025) and finds valid effective dates from cif.cif_cstmr_mstr.
+2. Operation (Logic): It runs the "Nearest Neighbor" logic (Cross Join + Min Diff) to map dates for that specific month.
+3. TABLE CREATED: The result is saved to a sandbox table.
+• Table: ucdb_chnseg_sbx.DY_datemap_3b
+• Action: saveAsTable
+4. TABLE CREATED: The result is also saved to a monthly backup table.
+• Table: rabp.AD44238_chnseg_cif_mstr_date_map_202511 (Variable name table_name_month)
+• Action: saveAsTable
+Phase 2: The Merge (Union with History)
+1. Operation (Union): The script reads the current production table (history) and combines it with the new monthly table using UNION.
+2. TABLE CREATED: The combined dataset (Old + New) is written to a temporary staging table.
+• Table: rabp.AD44238_chnseg_cif_mstr_date_map_temp
+• Action: saveAsTable
+Phase 3: The Swap (Go Live)
+1. TABLE DROPPED: The existing production table is removed to make space.
+• Table: rabp.AD44238_chnseg_cif_mstr_date_map
+• Action: DROP TABLE IF EXISTS
+2. TABLE ALTERED: The temporary table is renamed to become the new production table.
+• Table: rabp.AD44238_chnseg_cif_mstr_date_map_temp → rabp.AD44238_chnseg_cif_mstr_date_map
+• Action: ALTER TABLE ... RENAME TO ...
+

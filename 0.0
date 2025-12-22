@@ -1,0 +1,29 @@
+Phase 1: Calculation & Initial Storage
+1. Operation (Data Generation): The script generates a DataFrame of all calendar dates (date_df) and reads valid effective dates from the source (cif.cif_a2c_info).
+2. Operation (Logic): It performs a Cross Join between these two sets, calculates the date difference, and filters for the minimum difference (Nearest Neighbor logic).
+3. TABLE CREATED: The result is written to a sandbox table.
+• Table: ucdb_chnseg_sbx.DY_datemap_3
+• Action: saveAsTable
+Phase 2: Staging for Production
+1. TABLE CREATED: The same result is written to a temporary "staging" table in the production schema.
+• Table: rabp.AD44238_chnseg_a2c_date_map_temp
+• Action: saveAsTable
+Phase 3: The First Swap (Go Live)
+1. TABLE DROPPED: The existing production table is removed to make space.
+• Table: rabp.AD44238_chnseg_a2c_date_map
+• Action: DROP TABLE IF EXISTS
+2. TABLE ALTERED: The temporary table is renamed to become the production table.
+• Table: rabp.AD44238_chnseg_a2c_date_map_temp → rabp.AD44238_chnseg_a2c_date_map
+• Action: ALTER TABLE ... RENAME TO ...
+Phase 4: Optimization (Sorting)
+1. Operation (Sort): The script reads the new production table and orders the data by date (orderBy("date")).
+2. TABLE CREATED: The sorted data is saved to a backup table.
+• Table: rabp.AD44238_chnseg_a2c_date_map_b
+• Action: saveAsTable
+Phase 5: Final Commit
+1. TABLE DROPPED: The production table is dropped again.
+• Table: rabp.AD44238_chnseg_a2c_date_map
+• Action: DROP TABLE
+2. TABLE CREATED: The final, sorted table is recreated from the backup.
+• Table: rabp.AD44238_chnseg_a2c_date_map
+• Action: saveAsTable (from _b table)

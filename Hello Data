@@ -1,0 +1,24 @@
+Script 1: A2C Date Map
+• After calculating the nearest effective date for every calendar day using a cross-join and minimum difference logic, the table ucdb_chnseg_sbx.DY_datemap_3 is CREATED (Overwrite Mode).
+• After taking the data from the sandbox table to stage it, the table rabp.AD44238_chnseg_a2c_date_map_temp is CREATED (Overwrite Mode).
+• The code executes a command where the table rabp.AD44238_chnseg_a2c_date_map is DROPPED (IF EXISTS).
+• The code executes a command where the table rabp.AD44238_chnseg_a2c_date_map_temp is ALTERED (Renamed) to rabp.AD44238_chnseg_a2c_date_map.
+• After reading the new production table and sorting it by date, the backup table rabp.AD44238_chnseg_a2c_date_map_b is CREATED (Overwrite Mode).
+• The code executes a command where the table rabp.AD44238_chnseg_a2c_date_map is DROPPED.
+• After taking the sorted data from the backup table, the final table rabp.AD44238_chnseg_a2c_date_map is CREATED (Overwrite Mode).
+Script 2: CIF Master Date Map
+• After calculating the nearest effective date for the specific month's calendar days, the table ucdb_chnseg_sbx.DY_datemap_3b is CREATED (Overwrite Mode).
+• After selecting the data for the specific month key, the table rabp.AD44238_chnseg_cif_mstr_date_map_202511 (variable table_name_month) is CREATED (Overwrite Mode).
+• After performing a UNION of the existing production table and the new monthly table, the table rabp.AD44238_chnseg_cif_mstr_date_map_temp is CREATED (Overwrite Mode).
+• The code executes a command where the table rabp.AD44238_chnseg_cif_mstr_date_map is DROPPED.
+• The code executes a command where the table rabp.AD44238_chnseg_cif_mstr_date_map_temp is ALTERED (Renamed) to rabp.AD44238_chnseg_cif_mstr_date_map.
+Script 3: ATM Transactions
+• After joining the raw ATM transactions (filtered by '6011') with the A2C Date Map, the table ucdb_chnseg_sbx.ATM_data_sbx_202511 (variable table_name_a) is CREATED (Overwrite Mode). (Note: The explicit DROP command is commented out in the code).
+• After extracting distinct transaction dates and joining them with the CIF Master Date Map, the table ucdb_chnseg_sbx.ATM_data_sbx_202511_datelist (variable table_name_b) is CREATED (Overwrite Mode).
+• After joining the mapped dates with the Customer Master table to get Household IDs, the table ucdb_chnseg_sbx.ATM_data_sbx_202511_cif (variable table_name_c) is CREATED (Overwrite Mode).
+• After joining the raw ATM data (Table A) with the Customer Info (Table C), the table ucdb_chnseg_sbx.ATM_data_sbx_202511_f (variable table_name_d) is CREATED (Overwrite Mode).
+Script 5: AWS IVR Data
+• After joining the AWS contact records with the attributes table three times (for LOB, IVR_APP, and CIF_KEY), the table ucdb_chnseg_sbx.AWSIVR_202511b (variable table_name ending in 'b') is CREATED (Overwrite Mode). (Note: The explicit DROP command is commented out in the code).
+• After extracting distinct dates from the previous step and joining them with the CIF Master Date Map, the table ucdb_chnseg_sbx.AWSIVR_202511_datelist (variable table_name_c) is CREATED (Overwrite Mode).
+• After joining the mapped dates with the Customer Master table, the table ucdb_chnseg_sbx.AWSIVR_202511_cif (variable table_name_d) is CREATED (Overwrite Mode).
+• After joining the staged IVR data (Table B) with the Customer Info (Table D), the table ucdb_chnseg_sbx.AWSIVR_202511f (variable table_name_f) is CREATED (Overwrite Mode).

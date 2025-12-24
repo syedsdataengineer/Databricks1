@@ -170,3 +170,31 @@ Script 5: AWS IVR Data
 • ucdb_chnseg_sbx.AWSIVR_202511_cif (Customer Helper)
 • ucdb_chnseg_sbx.AWSIVR_202511_datelist (Date Helper)
 • ucdb_chnseg_sbx.AWSIVR_202511b (Staging Data)
+
+
+
+
+
+
+
+
+
+
+
+
+script 8(10th file)
+
+
+
+Script 8: Household CIN Profile (Channel Segmentation)
+• (Cell 23) After performing a cross-join between distinct Customer Keys (CIF) and the Week Calendar to create a base timeline, the table rabp.AD44238_CHNSEG_CIN_WEEK_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 26) After joining the base timeline with raw interaction data to sum transaction counts (Teller, Agent, ATM, Mobile, etc.) by week, the table rabp.AD44238_CHNSEG_CIN_W_ACT_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 28) After aggregating the weekly interaction counts up to the Monthly level (grouping by month_seq), the table rabp.AD44238_CHNSEG_CIN_M_ACT_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 30) After aggregating the interaction counts up to the Quarterly level (grouping by quarter_seq), the table rabp.AD44238_CHNSEG_CIN_Q_ACT_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 32) After aggregating the interaction counts up to the Semi-Annual level (grouping by semiannual_seq), the table rabp.AD44238_CHNSEG_CIN_S_ACT_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 34) After aggregating the interaction counts up to the Yearly level to get total annual volumes per customer, the table rabp.AD44238_CHNSEG_CIN_Y_ACT_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 44) After applying logic to categorize each channel (Agent, TCC, Digital, etc.) into frequency buckets (e.g., '01.Never', '05.Monthly', '06.Weekly'), the classification table rabp.AD44238_CHNSEG_CIN_CTG_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 53) After applying complex preference logic to determine specific segments (e.g., "Multi-Channel (Non-Branch)" vs. "Digital Only") based on frequency combinations, the table rabp.AD44238_CHNSEG_CIN_CTG_6_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 58) After refining the segment flags and filtering for the final required columns, the staging table rabp.AD44238_CHNSEG_CIN_CTG_F_{output_file_date} is CREATED (Overwrite Mode).
+• (Cell 60) After joining the computed Channel Segments with the main Customer Demographics (City, State, Tenure, Generation), the final output table {output_file_name} is CREATED (Overwrite Mode).
+• (Cell 63) After selecting all records from the final output to create a standalone "Current" snapshot for immediate usage, the table rabp.AD44238_CHNSEG_CIN_CURR is CREATED (Overwrite Mode).

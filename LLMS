@@ -1,0 +1,68 @@
+from pyspark.sql.functions import sequence, explode, to_date, expr, lit, col
+from pyspark.sql.types import *
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+import logging
+import sys
+
+def get_prev_month_date(current_date):
+    current_month_start = current_date.replace(day=1)
+    # Logic to get previous month date
+    prev_month_date = current_month_start - relativedelta(months=1)
+    
+    return prev_month_date
+
+def process_channel_data(channel, month_key, schema):
+    
+    # Table name construction
+    target_table = f"{schema}.AD44238_CHNSEG_{channel}_{month_key}F"
+    source_table = f"ucdb_chnseg_sbx.AD44238_CHNSEG_{channel}_{month_key}F"
+    
+    logging.info(f"Processing Channel: {channel}")
+
+    # Dropping and Creating output table
+    spark.sql(f"DROP TABLE IF EXISTS {target_table}")
+    spark.sql(f"CREATE TABLE {target_table} AS SELECT * FROM {source_table}")
+
+def main():
+    # Table schema
+    schema = "rabp"
+    
+    current_date = datetime.today().date()
+    
+    # Get previous month date
+    prev_month_date = get_prev_month_date(current_date)
+    
+    # Converting date in str to int 
+    month_key = int(prev_month_date.strftime('%Y%m'))
+    
+    logging.warn(f"Calculated Month Key: {month_key}")
+    
+    channel_list = ['ATM', 'TCCAgent', 'AWSIVR', 'DGTL', 'TE']
+
+    for channel in channel_list:
+        process_channel_data(channel, month_key, schema)
+
+if __name__ == "__main__":
+    consoleLogger = logging.StreamHandler()
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S', handlers=[consoleLogger])
+    logger = logging.getLogger()
+
+    try:
+        TodayDate = datetime.now()
+        todayYMD = str(TodayDate.strftime("%Y%m%d"))
+        logging.info("Execution Start Time: " + str(datetime.now().strftime("%m/%d/%Y, %H:%M:%S")))
+        
+        main()
+        
+        logging.info("Success running pipeline on " + todayYMD)
+        logging.info("Execution End Time:" + str(datetime.now().strftime("%m/%d/%Y, %H:%M:%S")))
+    except:
+        TodayDate = datetime.now()
+        todayYMD = str(TodayDate.strftime("%Y%m%d"))
+        logging.error("Error running pipeline on " + todayYMD)
+        logging.error(sys.exc_info()[0])
+        logging.error(sys.exc_info()[1])
+        logging.error(sys.exc_info()[2])
+        sys.exit(2)

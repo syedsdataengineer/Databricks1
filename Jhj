@@ -1,1 +1,2 @@
-beeline -u "jdbc:hive2://devhive.bbtnet.com:10001/default;principal=hive/_HOST@BBTNET.COM;ssl=true" --silent=true -e "DESCRIBE FORMATTED ucdb_rsbb_mdl_sbx.ccea_tcc_model_cplts_daily_test1;"
+yarn logs -applicationId application_1767834162544_1230 | grep -iE "Stage|Task|Scanning|Table" | tail -n 20
+

@@ -1,0 +1,5 @@
+Detailed Description:
+• Current Issue: Spark application (ID: application_1767834162544_1242) is stuck in ACCEPTED state and failing to launch executors.
+• Log Error: The logs are repeating the following warning: Initial job has not accepted any resources; check your cluster UI to ensure that workers are registered and have sufficient resources.
+• Observation: The job has successfully moved past the metadata cleaning phase but is unable to acquire VCores or memory from the YARN Resource Manager to begin data processing.
+• Impact: Production script model_call_complaint_daily_v2.py is blocked on node m4 (dev-sedlhdpm4).

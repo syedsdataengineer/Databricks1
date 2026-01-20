@@ -1,0 +1,9 @@
+1. Database & Table Redirection
+• Environment Switch: You changed all database pointers from _prd to _sbx.
+• Source Tables: You redirected the script to pull from the sandbox versions:
+• ucdb_tcc_mdl_sbx.ccea_cplt_pred_calls
+• ucdb_rsbb_mdl_sbx.ccea_tcc_call_reasons
+• Output Table: You updated the final table name to the one you manually created and altered: ucdb_rsbb_mdl_sbx.ccea_tcc_model_cplts_daily_test1.
+2. Schema Alignment
+• Column Rename: In your join logic, you changed the column name from eff_dt to edl_eff_dt to match the actual schema of the ucdb_rsbb sandbox table.
+• Join Logic: You ensured the SQL within the script correctly maps to the edl_eff_dt column found in ccea_tcc_call_reasons.

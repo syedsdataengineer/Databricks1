@@ -175,6 +175,43 @@ Script 5: AWS IVR Data
 
 
 
+INSERT INTO TABLE ucdb_rsbb_mdl_sbx.ccea_tcc_call_reasons 
+VALUES (
+  '827abd2b-9f05-49e9-8136-21ee0fb87ebc',
+  '0181e720-c68e-4607-8999-10a0a8da0c65',
+  '2026-01-10',
+  '51749743',
+  'AGENT-Hello, thank you for calling...',
+  2,
+  'Payments',
+  20260110,
+  20260110
+);
+
+
+
+
+INSERT INTO TABLE ucdb_tcc_mdl_sbx.ccea_cplt_pred_calls 
+VALUES (
+  '827abd2b-9f05-49e9-8136-21ee0fb87ebc',
+  '0181e720-c68e-4607-8999-10a0a8da0c65',
+  '2026-01-10 16:28:57',
+  '51749743',
+  'AGENT-Hello, thank you for calling...',
+  1,
+  0.2814375,
+  'Tier 1',
+  0.0646961,
+  'Phone Channel - About TCC Only',
+  0.3863011,
+  20260110,
+  20260110
+);
+
+
+
+
+
 
 
 

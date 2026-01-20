@@ -1,0 +1,1 @@
+beeline -u "jdbc:hive2://devhive.bbtnet.com:10001/default;principal=hive/_HOST@BBTNET.COM;ssl=true" --silent=true -e "SHOW DATABASES LIKE 'ucdb_tcc_mdl_sbx';"

@@ -22,3 +22,12 @@ testDF = spark.createDataFrame(dummy_data, columns)
 
 # Call the function with testDF instead of modelledCallComplaintF
 saveFinalResults(spark, log, finalDF=testDF, scheme=scheme, tableName=finalTableName)
+
+
+
+
+# RECOMMENDED: Use raw numbers for IDs, Flags, and the Run Date
+dummy_data = [
+    ("JAN_KEY_01", "1001", "2001", "2026-01-21 10:00:00", "2026-01-21", "2026-01-21", 1.0, "TypeA", "Level4", "NET01", "COST01", "Summary 1", "Reason 1", 20260121),
+    ("JAN_KEY_02", "1002", "2002", "2026-01-21 11:00:00", "2026-01-21", "2026-01-21", 0.0, "TypeB", "Level4", "NET02", "COST02", "Summary 2", "Reason 2", 20260121)
+]

@@ -1,0 +1,24 @@
+# Create 2 lines of hardcoded data to test the successful insertion path
+dummy_data = [
+    ("KEY001", "INIT001", "CONT001", "2026-01-21 10:00:00", "2026-01-21", "2026-01-21", "Y", "TypeA", "Level4", "NET01", "COST01", "Summary 1", "Reason 1", "2026-01-21"),
+    ("KEY002", "INIT002", "CONT002", "2026-01-21 11:00:00", "2026-01-21", "2026-01-21", "N", "TypeB", "Level4", "NET02", "COST02", "Summary 2", "Reason 2", "2026-01-21")
+]
+
+
+
+
+
+columns = [
+    "cif_key", "Initialcontactid", "Contactid", "initiationtimestamp", 
+    "call_dt_est", "call_date", "complaint_flg", "case_dsgnt_ty_nm", 
+    "cat_lvl_4_nm", "net_id", "workday_cost_center", "Call_summary", 
+    "Call_Reason", "run_dt"
+]
+
+
+
+# Create the test DataFrame
+testDF = spark.createDataFrame(dummy_data, columns)
+
+# Call the function with testDF instead of modelledCallComplaintF
+saveFinalResults(spark, log, finalDF=testDF, scheme=scheme, tableName=finalTableName)

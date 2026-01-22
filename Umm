@@ -1,0 +1,1 @@
+beeline -u "jdbc:hive2://devhive.bbnet.com:10001/default;principal=hive/_HOST@BBNET.COM;sasl=true"

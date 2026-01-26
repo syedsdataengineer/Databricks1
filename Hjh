@@ -1,0 +1,8 @@
+SELECT
+    t1.cnt AS add1,
+    t2.cnt AS add2
+FROM
+    (SELECT COUNT(*) AS cnt FROM ucdd_change_sax_2014328_change_sax_2014328_data_map_test_670803) t1
+JOIN
+    (SELECT COUNT(*) AS cnt FROM ucdd_change_sax_2014328_change_sax_2014328_data_map_test_670804) t2
+ON 1=1;

@@ -1,3 +1,11 @@
+
+SELECT * 
+FROM AD14238.chmsec_clf_mstr_date_map_976083 t1 
+INNER JOIN AD14238.chmsec_clf_mstr_date_map t2 ON t1.ID = t2.ID 
+WHERE t1.Column2 <> t2.Column2;
+
+
+
 import requests
 from requests.auth import HTTPBasicAuth
 import base64

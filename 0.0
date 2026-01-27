@@ -1,3 +1,16 @@
+SELECT t1.tran_term
+FROM ucdb_chnseg_sbx.G76083_chnseg_atm_202512ff t1
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM ucdb_chnseg_sbx.AD44238_chnseg_atm_202512ff t2
+    WHERE t1.tran_term = t2.tran_term
+);
+
+
+
+
+
+
 Phase 1: Calculation & Initial Storage
 1. Operation (Data Generation): The script generates a DataFrame of all calendar dates (date_df) and reads valid effective dates from the source (cif.cif_a2c_info).
 2. Operation (Logic): It performs a Cross Join between these two sets, calculates the date difference, and filters for the minimum difference (Nearest Neighbor logic).

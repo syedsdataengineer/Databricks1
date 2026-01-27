@@ -1,0 +1,9 @@
+Hi Hadoop Team,
+Could you please provide the specific AD Group names for the following schemas?
+1. Write Access Groups:
+• Dev, Test, QA: ucdb_rsbb_mdl_sbx
+• PROD: ucdb_tcc_mdl_prd
+2. Read Access Groups:
+• aws_connect_rtl
+• wdy
+• SCN

@@ -1,0 +1,6 @@
+Hi Team,
+Could you please confirm that the following Informatica accounts have Read/Write access to the CCM and CCM_STG schemas?
+• DEV: SV-UNIX-CCMDEV
+• QA: SV-UNIX-CCMQA
+• TEST: SV-UNIX-CCMTST
+• PROD: SV-UNIX-CCMPROD

@@ -6,6 +6,14 @@ WHERE NOT EXISTS (
     WHERE t1.tran_term = t2.tran_term
 );
 
+/* Get rows in Table 1 that are NOT exactly the same in Table 2 */
+SELECT tran_term, iss_bank_num 
+FROM ucdb_chnseg_sbx.G76083_chnseg_atm_202512ff
+MINUS
+SELECT tran_term, iss_bank_num 
+FROM ucdb_chnseg_sbx.AD44238_chnseg_atm_202512ff;
+
+
 
 
 

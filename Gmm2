@@ -1,0 +1,14 @@
+Hi Hadoop Team,
+Could you please verify that the following Service Accounts have the specific permissions listed below?
+1. Read & Write Access:
+• ucdb_tcc_mdl_prd
+2. Read-Only Access:
+• aws_connect_rtl
+• wdy
+• SCN
+Service Accounts:
+• Dev: sv-edldev1-analytics
+• QA: sv-edlqas1-analytics
+• TEST: sv-edltst1-analytics
+• PROD: sv-edlprd1-analytics
+Please confirm if these permissions are currently in place.

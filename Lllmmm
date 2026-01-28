@@ -1,0 +1,7 @@
+Hi Team,
+We are currently facing multiple job failures in production that are blocking our downstream processing. Our dependent jobs are currently stuck in a "waiting" state.
+Could you please investigate the root cause for the following failures?
+• DTDPLCCM – Failed at step GEN 510
+• (Specific failures: DTDPLCCMDATA_PRD, DTDPLCCRDATA_PRD, DTDPLCCSDATA_PRD)
+• DTDPLATR – Failed at DTDPLATRDATA (GEN 1033)
+• DTDPLCUB – Failed at DTDPLCUBEDATA (GEN 1159)

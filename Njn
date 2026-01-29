@@ -1,0 +1,5 @@
+INSERT INTO ucdb.chnseg_sbx.sample_emp_1 
+PARTITION (edl_eff_dt = DATE '2026-01-01')
+VALUES
+(1, 'Mark', 'NY', 100),
+(2, 'Henry', 'IL', 200);

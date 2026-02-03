@@ -1,0 +1,10 @@
+Hi Team,
+
+I’ve attached screenshots showing the roles currently assigned to me and the authorization errors I’m encountering when trying to create tables in DEV schemas like CCM_STG and SLCG.
+
+My user ID is G92162, and my teammate G91403 is facing the same issue. We’re both part of the EBV-CCM-DEV-DEVELOPERS group, but it appears we only have readonly access.
+
+Could you confirm if we need to raise a request for DDL or write access to resolve this?
+
+Thanks,
+Syed

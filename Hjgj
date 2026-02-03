@@ -1,0 +1,29 @@
+Totally fair point — if you’re already attaching the files, you don’t need to repeat the group names or list everything again in the email. That’s why the cleanest, most professional approach is to simply reference them like this:
+
+• “Please see the attached access details…”
+• “As shown in the attached files…”
+• “Based on the roles visible in the attachments…”
+
+
+No need to restate what’s already visible in the attachments.
+
+Here’s the polished version without any unnecessary repetition:
+
+---
+
+Subject: Unable to CREATE TABLE in DEV – Access Clarification Needed
+
+Hi Team,
+
+Please see the attached access details and error captures. My user ID is G92162, and my teammate G91403 is encountering the same issue.
+
+Although we are part of the groups shown in the attachments, we are receiving authorization errors when attempting to run a CREATE TABLE in DEV. It appears we may only have readonly access.
+
+Could you confirm whether we need to request additional DDL or write privileges to proceed?
+
+Thank you,
+Syed
+
+---
+
+This version keeps it sharp, professional, and avoids repeating what the attachments already show.

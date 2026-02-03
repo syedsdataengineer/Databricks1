@@ -1,0 +1,20 @@
+Here’s a clean, professional draft you can send with both screenshots attached:
+
+---
+
+Subject: Unable to CREATE TABLE – Requesting DDL Access Clarification
+
+Hi Team,
+
+I’m currently assigned to the eggy-com-dev-developers group with readonly roles (APPID:203582182), and my user ID is G92162. My teammate G91403 is facing the same issue.
+
+We’re both receiving authorization errors when attempting to run CREATE TABLE statements in DEV schemas like CCM_STG and SLCG. I’ve attached screenshots showing the exact error messages.
+
+Could you confirm if we need to raise a request for additional DDL or write access to resolve this?
+
+Thanks,
+Syed
+
+---
+
+Let me know if you’d like to include the exact table names or schema paths for faster routing.

@@ -1,0 +1,146 @@
+INSERT INTO model_cplts_daily_5752674
+PARTITION (RUN_DT = 20250616)
+
+-- 1
+SELECT '333330','a','c0001',CAST('2026-02-03 12:00:00' AS TIMESTAMP),
+       'Loan Related','Loan Related','Goal A'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 2
+SELECT '333331','b','c0002',CAST('2026-02-03 12:01:00' AS TIMESTAMP),
+       'Deposits','Deposits','Goal B'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 3
+SELECT '333332','c','c0003',CAST('2026-02-03 12:02:00' AS TIMESTAMP),
+       'Card Activation','Card Activation','Goal C'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 4
+SELECT '333333','d','c0004',CAST('2026-02-03 12:03:00' AS TIMESTAMP),
+       'Zelle Issues','Zelle Issues','Goal D'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 5
+SELECT '333334','e','c0005',CAST('2026-02-03 12:04:00' AS TIMESTAMP),
+       'Log-in Issues','Log-in Issues','Goal E'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 6
+SELECT '333335','f','c0006',CAST('2026-02-03 12:05:00' AS TIMESTAMP),
+       'Open/Close Account','Open/Close Account','Goal F'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 7
+SELECT '333336','g','c0007',CAST('2026-02-03 12:06:00' AS TIMESTAMP),
+       'Funds Transfer','Funds Transfer','Goal G'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 8
+SELECT '333337','h','c0008',CAST('2026-02-03 12:07:00' AS TIMESTAMP),
+       'Branch','Branch','Goal H'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 9
+SELECT '333338','i','c0009',CAST('2026-02-03 12:08:00' AS TIMESTAMP),
+       'Rates','Rates','Goal I'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 10
+SELECT '333339','j','c0010',CAST('2026-02-03 12:09:00' AS TIMESTAMP),
+       'Claims/Disputes','Claims/Disputes','Goal J'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 11
+SELECT '333340','k','c0011',CAST('2026-02-03 12:10:00' AS TIMESTAMP),
+       'Check Balance','Check Balance','Goal K'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 12
+SELECT '333341','l','c0012',CAST('2026-02-03 12:11:00' AS TIMESTAMP),
+       'Digital/App','Digital/App','Goal L'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 13
+SELECT '333342','m','c0013',CAST('2026-02-03 12:12:00' AS TIMESTAMP),
+       'Withdrawal Limit','Withdrawal Limit','Goal M'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 14
+SELECT '333343','n','c0014',CAST('2026-02-03 12:13:00' AS TIMESTAMP),
+       'Fraud','Fraud','Goal N'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 15
+SELECT '333344','o','c0015',CAST('2026-02-03 12:14:00' AS TIMESTAMP),
+       'Debit Card','Debit Card','Goal O'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 16
+SELECT '333345','p','c0016',CAST('2026-02-03 12:15:00' AS TIMESTAMP),
+       'Transactions','Transactions','Goal P'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 17
+SELECT '333346','q','c0017',CAST('2026-02-03 12:16:00' AS TIMESTAMP),
+       'Credit Card','Credit Card','Goal Q'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 18
+SELECT '333347','r','c0018',CAST('2026-02-03 12:17:00' AS TIMESTAMP),
+       'Increase Limit','Increase Limit','Goal R'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 19
+SELECT '333348','s','c0019',CAST('2026-02-03 12:18:00' AS TIMESTAMP),
+       'Payments','Payments','Goal S'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 20
+SELECT '333349','t','c0020',CAST('2026-02-03 12:19:00' AS TIMESTAMP),
+       'Personal/Business Account','Personal/Business Account','Goal T'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 21
+SELECT '333350','u','c0021',CAST('2026-02-03 12:20:00' AS TIMESTAMP),
+       'Address Update','Address Update','Goal U'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 22
+SELECT '333351','v','c0022',CAST('2026-02-03 12:21:00' AS TIMESTAMP),
+       'Fees','Fees','Goal V'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 23
+SELECT '333352','w','c0023',CAST('2026-02-03 12:22:00' AS TIMESTAMP),
+       'Other','Other','Goal W'
+FROM (SELECT 1) dummy
+
+UNION ALL
+-- 24 (NULL row)
+SELECT '333353','x','c0024',CAST('2026-02-03 12:23:00' AS TIMESTAMP),
+       NULL,NULL,NULL
+FROM (SELECT 1) dummy
+;

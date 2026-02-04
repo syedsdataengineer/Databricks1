@@ -1,0 +1,24 @@
+Got you — here’s a clean, unified, fully professional version that includes both points:
+
+• Your job is stuck in PREDWAIT
+• The predecessor job has been force‑completed since Jan 30th
+
+
+You can drop this directly into your email.
+
+---
+
+Subject: Review Requested: Predecessor Job Force‑Completed Since Jan 30th and Blocking Our Workflow
+
+Hi team,
+
+Our job DTDPLTPML_PROD (DTDPLTP‑0000023) is currently in PREDWAIT status and is waiting on its predecessor. We also noticed that the predecessor job has been force‑completed starting January 30th, which may be contributing to the delay.
+
+Could someone please review the predecessor job and confirm why it has been force‑completed since Jan 30th, and whether this is expected behavior? This dependency is currently blocking our workflow.
+
+Thank you,
+Syed
+
+---
+
+If you want, I can tailor it further with the exact predecessor job name from your earlier screenshots.

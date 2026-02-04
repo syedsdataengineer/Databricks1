@@ -1,0 +1,28 @@
+Right — that’s exactly the point. If you just say “why is this being force completed?” with no context, Hadoop Ops won’t magically know which job, which workflow, or which date range you’re talking about.
+
+Let’s fix it so they have everything they need in one shot.
+
+Clean, complete version you can send
+
+Subject: Inquiry on Forced Completion for DTDPVOCVRCDLV_PRD
+
+Hi Hadoop Ops Team,
+
+We’re seeing that the job DTDPVOCVRCDLV_PRD (DTDPVOC1‑0000009) is being force‑completed starting January 30th. Could you confirm why this is happening and whether there was a configuration or dependency change?
+
+Attaching screenshots for reference.
+
+Thanks,
+Syed
+
+---
+
+If you want, I can tailor it further by including:
+
+• The parent/child nodes from the flow
+• The job history entries
+• The exact timestamps
+• The PRODPTPM_PROD job history screenshot
+
+
+Just tell me what level of detail you want.

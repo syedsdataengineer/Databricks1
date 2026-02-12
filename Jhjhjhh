@@ -1,0 +1,14 @@
+Project Updates
+- Completed testing phase; ready for migration steps  
+- Agreement being secured for migration plan  
+- Production move expected in a couple of weeks after approval  
+
+Migration Plan
+- Goal: migrate cube and replace the eight model  
+- Need to address look‑up time and variable handling during migration  
+- Ensure active replication remains functional throughout transition  
+
+Look‑up Tables & Data Handling
+- Question raised: what happens when a new entry isn’t in the existing look‑up?  
+- Likely outcome: entry returns blank or default value (to be confirmed)  
+- Plan to review and possibly adjust look‑up logic before go‑live  

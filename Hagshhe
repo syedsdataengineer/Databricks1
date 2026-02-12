@@ -1,0 +1,6 @@
+SELECT h_di_cif_static_key,
+       COUNT(*) AS active_count
+FROM ucdb_chnseg_sbx.cif_cstmr_mstr_scd_2
+WHERE is_current = 'Y'
+GROUP BY h_di_cif_static_key
+HAVING COUNT(*) > 1;

@@ -1,0 +1,16 @@
+WITH ranked AS (
+    SELECT
+        static_key,
+        is_current,
+        insert_timestamp,
+        ROW_NUMBER() OVER (
+            PARTITION BY static_key
+            ORDER BY insert_timestamp DESC
+        ) AS rn
+    FROM ucdb_chnseg_sbx.cif_cstmr_mstr_scd_4
+    WHERE is_current = 'Y'
+)
+
+SELECT *
+FROM ranked
+WHERE rn > 1;
